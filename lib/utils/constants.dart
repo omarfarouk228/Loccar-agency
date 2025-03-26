@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:loccar_agency/utils/colors.dart';
 import 'package:shimmer/shimmer.dart';
 
 import 'dimensions.dart';
 
 class Constants {
   static String logo = "assets/images/logo.png";
-  static String appName = "SOGENUVO";
+  static String appName = "LOCCAR AGENCE";
 
   static String host = "https://api.sogenuvo.com";
 
   static String mediaHost = "https://api.sogenuvo.com";
-
-  static Color primaryColor = const Color(0xff322975);
-  static Color secondaryColor = const Color(0xfffc7d00);
-  static Color thirdyColor = const Color(0xff12bde2);
 
   static String currentFontFamily = "Lato";
   static String secondFontFamily = "LilitaOne";
@@ -82,7 +79,7 @@ class Constants {
         AlertDialog(title: Text(title), content: Text(content), actions: [
       TextButton(
         style: TextButton.styleFrom(
-          backgroundColor: Constants.primaryColor,
+          backgroundColor: AppColors.primaryColor,
         ),
         child: Text(actionText, style: const TextStyle(color: Colors.white)),
         onPressed: () {
@@ -127,15 +124,15 @@ class Constants {
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade400,
       period: const Duration(seconds: 1),
-      highlightColor: Constants.primaryColor.withOpacity(0.3),
+      highlightColor: AppColors.primaryColor.withOpacity(0.3),
       child: ListTile(
         title: Card(
           child: SizedBox(
-              height: 10, width: Dimension.getScreenWidth(context) * 0.2),
+              height: 10, width: Dimensions.getScreenWidth(context) * 0.2),
         ),
         subtitle: Card(
           child: SizedBox(
-              height: 10, width: Dimension.getScreenWidth(context) * 0.5),
+              height: 10, width: Dimensions.getScreenWidth(context) * 0.5),
         ),
         leading: const CircleAvatar(),
       ),
@@ -165,10 +162,10 @@ class Constants {
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade400,
       period: const Duration(seconds: 1),
-      highlightColor: Constants.primaryColor.withOpacity(0.3),
+      highlightColor: AppColors.primaryColor.withOpacity(0.3),
       child: Card(
         child: Container(
-          width: Dimension.getScreenWidth(context),
+          width: Dimensions.getScreenWidth(context),
           height: 5,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
@@ -182,7 +179,7 @@ class Constants {
     return Shimmer.fromColors(
         baseColor: Colors.grey.shade400,
         period: const Duration(seconds: 1),
-        highlightColor: Constants.primaryColor.withOpacity(0.3),
+        highlightColor: AppColors.primaryColor.withOpacity(0.3),
         child: Padding(
           padding: const EdgeInsets.only(right: 3.0),
           child: Stack(
@@ -194,8 +191,8 @@ class Constants {
                     children: [
                       Card(
                         child: Container(
-                          width: Dimension.getScreenWidth(context),
-                          height: Dimension.getScreenHeight(context) * 0.15,
+                          width: Dimensions.getScreenWidth(context),
+                          height: Dimensions.getScreenHeight(context) * 0.15,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -207,7 +204,7 @@ class Constants {
                     height: 7,
                   ),
                   SizedBox(
-                    width: Dimension.getScreenWidth(context),
+                    width: Dimensions.getScreenWidth(context),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 5),
                       child: Column(
@@ -215,7 +212,7 @@ class Constants {
                         children: [
                           Card(
                             child: Container(
-                              width: Dimension.getScreenWidth(context) * 0.5,
+                              width: Dimensions.getScreenWidth(context) * 0.5,
                               height: 10,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
@@ -227,7 +224,7 @@ class Constants {
                           ),
                           Card(
                             child: Container(
-                              width: Dimension.getScreenWidth(context),
+                              width: Dimensions.getScreenWidth(context),
                               height: 10,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),

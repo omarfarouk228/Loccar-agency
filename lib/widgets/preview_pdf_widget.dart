@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-
-import '../utils/constants.dart';
+import 'package:loccar_agency/utils/colors.dart';
 
 class PreviewPDFWidget extends StatelessWidget {
   final String url;
@@ -18,7 +17,7 @@ class PreviewPDFWidget extends StatelessWidget {
         url,
         placeholder: (double progress) => Center(
           child: SpinKitCubeGrid(
-            color: Constants.primaryColor,
+            color: AppColors.primaryColor,
             size: 40.0,
           ),
         ),

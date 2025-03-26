@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loccar_agency/models/vehicule.dart';
-import 'package:loccar_agency/utils/constants.dart';
+import 'package:loccar_agency/utils/colors.dart';
 import 'package:badges/badges.dart' as badges;
 
 class VehiculeWidget extends StatefulWidget {
@@ -34,7 +34,7 @@ class _VehiculeWidgetState extends State<VehiculeWidget> {
                     style: TextStyle(color: Colors.white),
                   ),
                   badgeStyle:
-                      badges.BadgeStyle(badgeColor: Constants.secondaryColor),
+                      badges.BadgeStyle(badgeColor: AppColors.secondaryColor),
                   position: badges.BadgePosition.topEnd(top: -10, end: -5),
                   child: ListTile(
                       title: Text(
@@ -44,7 +44,7 @@ class _VehiculeWidgetState extends State<VehiculeWidget> {
                       subtitle:
                           Text("Numéro de plaque: ${widget.vehicule.plaque}"),
                       leading: CircleAvatar(
-                          backgroundColor: Constants.primaryColor,
+                          backgroundColor: AppColors.primaryColor,
                           radius: 25,
                           child: const Padding(
                             padding: EdgeInsets.all(3.0),
@@ -61,7 +61,7 @@ class _VehiculeWidgetState extends State<VehiculeWidget> {
                             height: 30,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: Constants.primaryColor,
+                              color: AppColors.primaryColor,
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                             child: const FaIcon(
@@ -77,7 +77,7 @@ class _VehiculeWidgetState extends State<VehiculeWidget> {
                   ),
                   subtitle: Text("Numéro de plaque: ${widget.vehicule.plaque}"),
                   leading: CircleAvatar(
-                      backgroundColor: Constants.primaryColor,
+                      backgroundColor: AppColors.primaryColor,
                       radius: 25,
                       child: const Padding(
                         padding: EdgeInsets.all(3.0),
@@ -94,7 +94,7 @@ class _VehiculeWidgetState extends State<VehiculeWidget> {
                         height: 30,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: Constants.primaryColor,
+                          color: AppColors.primaryColor,
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                         child: const FaIcon(

@@ -1,14 +1,14 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:loccar_agency/screens/dashboard/dashboard_screen.dart';
 import 'package:loccar_agency/utils/assets.dart';
-import 'package:loccar_agency/utils/constants.dart';
-import 'package:loccar_agency/widgets/custom_widgets.dart';
+import 'package:loccar_agency/utils/colors.dart';
+import 'package:loccar_agency/utils/dimensions.dart';
+import 'package:loccar_agency/utils/preferences.dart';
+import 'package:loccar_agency/utils/snack_bar_helper.dart';
+import 'package:loccar_agency/widgets/buttons/rounded_button.dart';
+import 'package:loccar_agency/widgets/textfields/custom_password_field.dart';
+import 'package:loccar_agency/widgets/textfields/custom_text_field.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -18,499 +18,250 @@ class LoginScreen extends StatefulWidget {
   LoginScreenState createState() => LoginScreenState();
 }
 
-class LoginScreenState extends State<LoginScreen>
-    with TickerProviderStateMixin {
-  final _passwordController = TextEditingController();
-  final _emailController = TextEditingController();
-  bool _passwordVisible = false;
+class LoginScreenState extends State<LoginScreen> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
   bool isLoading = false;
-  late TabController _controller;
-  String telephone = "";
-  String indicatif = "+228";
-  String pays = "";
-  @override
-  void initState() {
-    super.initState();
-    _controller = TabController(length: 2, vsync: this);
-  }
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
+    double screenHeight = Dimensions.getScreenHeight(context);
     return Scaffold(
-        backgroundColor: Colors.white,
-        body: SingleChildScrollView(
-          child: Stack(
-            children: [
-              Container(height: height * 0.63),
-              headerWidget(height: height * 0.55),
-              Card(
-                margin:
-                    EdgeInsets.only(left: 15, right: 15, top: height * 0.25),
-                elevation: 8,
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(40),
-                ),
-                child: Container(
-                  width: width,
-                  height: height * 0.63,
-                  padding: const EdgeInsets.all(20),
-                  child: Form(
-                    child: Column(children: [
-                      Text(
-                        "Remplir vos paramètres de connexion pour vous connecter à votre compte",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontFamily: Constants.currentFontFamily,
-                            color: Colors.black87,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        height: 55,
-                        decoration: BoxDecoration(
-                            color: Constants.primaryColor,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(15)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(.2),
-                                spreadRadius: 2,
-                                blurRadius: 20,
-                                offset: const Offset(0, 0),
-                              )
-                            ]),
-                        child: Padding(
-                            padding: const EdgeInsets.all(6),
-                            child: TabBar(
-                              controller: _controller,
-                              labelColor: Colors.white,
-                              indicatorColor: Colors.white,
-                              tabs: const [
-                                Tab(
-                                  icon: FaIcon(
-                                    FontAwesomeIcons.phone,
-                                    size: 10,
+      resizeToAvoidBottomInset: true,
+      body: Stack(
+        children: [
+          // Background Image
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image:
+                    AssetImage(AppAssets.authBg), // Replace with actual image
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+
+          // Overlay with Opacity
+          Container(
+            color: Colors.black.withOpacity(0.4),
+          ),
+
+          SafeArea(child: LayoutBuilder(builder: (context, constraints) {
+            return SingleChildScrollView(
+                child: ConstrainedBox(
+                    constraints:
+                        BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                      top: 40, bottom: 20),
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 10,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
                                   ),
-                                  text: 'Téléphone',
-                                ),
-                                Tab(
-                                  icon: FaIcon(
-                                    FontAwesomeIcons.envelope,
-                                    size: 10,
+                                  child: Center(
+                                    child: Image.asset(
+                                      AppAssets
+                                          .logoBlueSquare, // Replace with actual logo
+                                      width: 50,
+                                      height: 50,
+                                    ),
                                   ),
-                                  text: 'Adresse mail',
                                 ),
+                                const Text(
+                                    "Suivez en temps réel la gestion vos véhicules avec Loccar Agence.",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold)),
                               ],
-                            )),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      SizedBox(
-                        height: height * .18,
-                        child: TabBarView(
-                            controller: _controller,
-                            children: <Widget>[
-                              Column(
-                                children: [
-                                  Card(
-                                    elevation: 6.0,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          SizedBox(
-                                            width: width * 0.3,
-                                            child: CountryCodePicker(
-                                              onChanged: (e) {
-                                                setState(() {
-                                                  indicatif = e.code.toString();
-                                                  pays = e.name.toString();
-                                                  //print(pays);
-                                                });
+                            ),
+                          ),
+                          const Spacer(),
+                          SizedBox(
+                            width: Dimensions.getScreenWidth(context),
+                            height: screenHeight * 0.6,
+                            child: Form(
+                              key: formKey,
+                              child: Card(
+                                elevation: 10,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(25.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Créer un  compte',
+                                        style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      Dimensions.verticalSpacer(10),
+                                      Text(
+                                        "Nom *",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium!
+                                            .copyWith(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                      ),
+                                      Dimensions.verticalSpacer(5),
+                                      CustomTextField(
+                                        controller: emailController,
+                                        hintText: 'Ex: agence@gmail.com',
+                                        autofocus: true,
+                                        maxLength: 30,
+                                        keyboardType:
+                                            TextInputType.emailAddress,
+                                        errorMessage:
+                                            "L'adresse email est obligatoire",
+                                      ),
+                                      Dimensions.verticalSpacer(10),
+                                      Text(
+                                        "Mot de passe *",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium!
+                                            .copyWith(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                      ),
+                                      Dimensions.verticalSpacer(5),
+                                      CustomPasswordField(
+                                        controller: passwordController,
+                                        hintText: 'Mot de passe',
+                                        errorMessage:
+                                            "Le mot de passe doit contenir au moins 8 caractères",
+                                        passwordVisible: true,
+                                      ),
+                                      Dimensions.verticalSpacer(20),
+                                      !isLoading
+                                          ? RoundedButton(
+                                              isActive: true,
+                                              color: AppColors.primaryColor,
+                                              textColor: Colors.white,
+                                              text: 'Continuer',
+                                              onPressed: () {
+                                                if (formKey.currentState!
+                                                    .validate()) {
+                                                  setState(() {
+                                                    isLoading = true;
+                                                  });
+                                                  login();
+                                                }
                                               },
-                                              // Initial selection and favorite can be one of code ('IT') OR dial_code('+39')
-                                              initialSelection: 'TG',
-                                              favorite: const ['+228', 'TG'],
-                                              // optional. Shows only country name and flag
-                                              showCountryOnly: false,
-                                              // optional. Shows only country name and flag when popup is closed.
-                                              showOnlyCountryWhenClosed: false,
-                                              // optional. aligns the flag and the Text left
-                                              alignLeft: false,
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: TextField(
-                                              autofocus: false,
-                                              inputFormatters: [
-                                                LengthLimitingTextInputFormatter(
-                                                    8),
-                                              ],
-                                              decoration: const InputDecoration(
-                                                border: InputBorder.none,
-                                                hintText:
-                                                    "Entrer votre téléphone",
-                                                hintStyle: TextStyle(
-                                                  color: Color(0xff303030),
-                                                  fontSize: 12,
-                                                ),
+                                            )
+                                          : Center(
+                                              child: SpinKitThreeBounce(
+                                                color: AppColors.secondaryColor,
+                                                size: 30,
                                               ),
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  telephone = value;
-                                                });
-                                              },
-                                              onSubmitted: (e) {
-                                                //print(e.toString());
-                                              },
-                                              keyboardType:
-                                                  TextInputType.number,
                                             ),
+                                      const Spacer(),
+                                      const Text(
+                                        "Vous n'avez pas encore de compte ? Vous n'avez plus une minute à perdre!",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: Colors.black87,
+                                            fontSize: 14),
+                                      ),
+                                      Dimensions.verticalSpacer(5),
+                                      GestureDetector(
+                                        onTap: () async {
+                                          FocusManager.instance.primaryFocus
+                                              ?.unfocus();
+
+                                          var whatsappUrl =
+                                              "whatsapp://send?phone=22891019245"
+                                              "&text=${Uri.encodeComponent("Bonjour LOCCAR, j'aimerai avoir plus d'informations.")}";
+                                          var whatsappUrl2 =
+                                              "https://sogenuvo.com";
+                                          try {
+                                            if (await canLaunchUrl(
+                                                Uri.parse(whatsappUrl))) {
+                                              launchUrl(Uri.parse(whatsappUrl));
+                                            } else {
+                                              launchUrl(
+                                                  Uri.parse(whatsappUrl2));
+                                            }
+                                            // ignore: empty_catches
+                                          } catch (e) {}
+                                        },
+                                        child: const Center(
+                                          child: Text(
+                                            "Contactez-nous?",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                                decoration:
+                                                    TextDecoration.underline),
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Card(
-                                    margin: EdgeInsets.zero,
-                                    elevation: 6.0,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          SizedBox(
-                                              width: width * 0.8,
-                                              child: TextFormField(
-                                                keyboardType: TextInputType
-                                                    .visiblePassword,
-                                                obscureText: _passwordVisible,
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontFamily: Constants
-                                                      .currentFontFamily,
-                                                  fontSize: 16,
-                                                ),
-                                                controller: _passwordController,
-                                                decoration: InputDecoration(
-                                                  border: InputBorder.none,
-                                                  hintText:
-                                                      "Entrer votre mot de passe",
-                                                  hintStyle: TextStyle(
-                                                    color:
-                                                        const Color(0xff303030),
-                                                    fontSize: 14,
-                                                    fontFamily: Constants
-                                                        .currentFontFamily,
-                                                  ),
-                                                  prefixIcon: Icon(
-                                                    Icons.lock,
-                                                    color: Colors.black
-                                                        .withOpacity(0.5),
-                                                  ),
-                                                  suffixIcon: IconButton(
-                                                    icon: Icon(
-                                                      _passwordVisible
-                                                          ? Icons.visibility
-                                                          : Icons
-                                                              .visibility_off,
-                                                      color: Constants
-                                                          .primaryColor,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        _passwordVisible =
-                                                            !_passwordVisible;
-                                                      });
-                                                    },
-                                                  ),
-                                                ),
-                                              )),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Card(
-                                    margin: EdgeInsets.zero,
-                                    elevation: 6.0,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          SizedBox(
-                                              width: width * 0.7,
-                                              child: TextFormField(
-                                                keyboardType:
-                                                    TextInputType.emailAddress,
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontFamily: Constants
-                                                      .currentFontFamily,
-                                                  fontSize: 16,
-                                                ),
-                                                controller: _emailController,
-                                                decoration: InputDecoration(
-                                                  border: InputBorder.none,
-                                                  hintText:
-                                                      "Votre adresse mail",
-                                                  hintStyle: TextStyle(
-                                                    color:
-                                                        const Color(0xff303030),
-                                                    fontSize: 14,
-                                                    fontFamily: Constants
-                                                        .currentFontFamily,
-                                                  ),
-                                                  prefixIcon: Icon(
-                                                    Icons.mail,
-                                                    color: Colors.black
-                                                        .withOpacity(0.5),
-                                                  ),
-                                                ),
-                                              )),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Card(
-                                    margin: EdgeInsets.zero,
-                                    elevation: 6.0,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: <Widget>[
-                                          SizedBox(
-                                              width: width * 0.8,
-                                              child: TextFormField(
-                                                keyboardType: TextInputType
-                                                    .visiblePassword,
-                                                obscureText: _passwordVisible,
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontFamily: Constants
-                                                      .currentFontFamily,
-                                                  fontSize: 16,
-                                                ),
-                                                controller: _passwordController,
-                                                decoration: InputDecoration(
-                                                  border: InputBorder.none,
-                                                  hintText:
-                                                      "Entrer votre mot de passe",
-                                                  hintStyle: TextStyle(
-                                                    color:
-                                                        const Color(0xff303030),
-                                                    fontSize: 14,
-                                                    fontFamily: Constants
-                                                        .currentFontFamily,
-                                                  ),
-                                                  prefixIcon: Icon(
-                                                    Icons.lock,
-                                                    color: Colors.black
-                                                        .withOpacity(0.5),
-                                                  ),
-                                                  suffixIcon: IconButton(
-                                                    icon: Icon(
-                                                      _passwordVisible
-                                                          ? Icons.visibility
-                                                          : Icons
-                                                              .visibility_off,
-                                                      color: Constants
-                                                          .primaryColor,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        _passwordVisible =
-                                                            !_passwordVisible;
-                                                      });
-                                                    },
-                                                  ),
-                                                ),
-                                              )),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ]),
-                      ),
-                      Platform.isAndroid
-                          ? const SizedBox(
-                              height: 7,
-                            )
-                          : const SizedBox(),
-                      GestureDetector(
-                        child: Text(
-                          "Mot de passe oublié ?",
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Constants.secondaryColor,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline),
-                        ),
-                        onTap: () {},
-                      ),
-                      const SizedBox(
-                        height: 7,
-                      ),
-                      !isLoading
-                          ? Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 20, right: 20),
-                              child: CustomButton(
-                                color: Constants.primaryColor,
-                                textColor: Colors.white,
-                                text: 'Se Connecter',
-                                onPressed: () {
-                                  final email = _emailController.text.trim();
-                                  final password =
-                                      _passwordController.text.trim();
-
-                                  String numTel = "$indicatif$telephone";
-
-                                  //print(numTel);
-
-                                  // if (password != "") {
-                                  //   if (email != "") {
-                                  //     login(context, email, password);
-                                  //   } else if (telephone != "") {
-                                  //     login(context, numTel, password);
-                                  //   } else {
-                                  //     _showAlertDialog('Désolé',
-                                  //         'Veuillez renseigner vos informations.');
-                                  //   }
-                                  // } else {
-                                  //   _showAlertDialog('Désolé',
-                                  //       'Veuillez renseigner vos informations.');
-                                  // }
-                                },
-                              ),
-                            )
-                          : Center(
-                              child: SpinKitRotatingCircle(
-                                color: Constants.secondaryColor,
-                                size: 50,
+                                ),
                               ),
                             ),
-                      const SizedBox(
-                        height: 10,
+                          ),
+                          SizedBox(
+                              height: MediaQuery.of(context).viewInsets.bottom),
+                        ],
                       ),
-                      Text(
-                        "Vous n'avez pas encore de compte ? Vous n'avez plus une minute à perdre!",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontFamily: Constants.currentFontFamily,
-                            color: Colors.black87,
-                            fontSize: 14),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      GestureDetector(
-                        onTap: () async {
-                          FocusManager.instance.primaryFocus?.unfocus();
+                    )));
+          })),
 
-                          var whatsappUrl = "whatsapp://send?phone=22891019245"
-                              "&text=${Uri.encodeComponent("Bonjour SOGENUVO, j'aimerai avoir plus d'informations.")}";
-                          var whatsappUrl2 = "https://sogenuvo.com";
-                          try {
-                            if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
-                              launchUrl(Uri.parse(whatsappUrl));
-                            } else {
-                              launchUrl(Uri.parse(whatsappUrl2));
-                            }
-                            // ignore: empty_catches
-                          } catch (e) {}
-
-                          // launchUrl(Uri.parse("https://wa.me/22891019245"));
-                        },
-                        child: const Text(
-                          "Contactez-nous?",
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline),
-                        ),
-                      ),
-                    ]),
-                  ),
-                ),
-              )
-            ],
-          ),
-        ));
+          // Content
+        ],
+      ),
+    );
   }
 
-  headerWidget({required double height}) {
-    return Container(
-        height: height,
-        padding: EdgeInsets.only(top: height * 0.05),
-        alignment: Alignment.topCenter,
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Constants.primaryColor,
-                Constants.primaryColor,
-              ],
-            ),
-            borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(70),
-                bottomRight: Radius.circular(70))),
-        child: Column(
-          children: [
-            Platform.isIOS
-                ? const SizedBox(
-                    height: 70,
-                  )
-                : const SizedBox(
-                    height: 30,
-                  ),
-            const Image(
-              image: AssetImage(AppAssets.logoWhiteLarge),
-              width: 300,
-            ),
-            const Text(
-              "Connectez-vous à votre compte",
-              style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold),
-            ),
-          ],
-        ));
+  void login() {
+    if (emailController.text == "sogenuvo@gmail.com" &&
+        passwordController.text == "952489") {
+      setState(() {
+        isLoading = false;
+      });
+      SharedPreferencesHelper.setIntValue("step_auth", 1);
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const DashboardScreen(),
+          ),
+          (route) => false);
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      SnackBarHelper.showCustomSnackBar(
+          context, "Email ou mot de passe incorrect");
+    }
   }
 }

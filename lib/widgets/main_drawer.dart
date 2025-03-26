@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:loccar_agency/utils/assets.dart';
+import 'package:loccar_agency/utils/colors.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:loccar_agency/screens/auth/login_screen.dart';
 import 'package:loccar_agency/utils/constants.dart';
@@ -20,7 +22,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Constants.primaryColor,
+        backgroundColor: AppColors.primaryColor,
         body: Padding(
             padding: const EdgeInsets.only(top: 50, left: 10),
             child: ListView(padding: EdgeInsets.zero, children: [
@@ -34,7 +36,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   child: Padding(
                       padding: const EdgeInsets.all(12),
                       child: Image.asset(
-                        'assets/images/logo.png',
+                        AppAssets.logoBlueSquare,
                         width: 80,
                       )),
                 )
@@ -67,24 +69,24 @@ class _DrawerScreenState extends State<DrawerScreen> {
               Row(
                 children: [
                   drawerList2(
-                      FontAwesomeIcons.car, "Géolocalisations", const Center()),
+                      FontAwesomeIcons.users, "Propriétaires", const Center()),
                   const SizedBox(
                     width: 10,
                   ),
                   drawerList2(
-                      FontAwesomeIcons.fileInvoice, "Factures", const Center()),
+                      FontAwesomeIcons.fileInvoice, "Voitures", const Center()),
                 ],
               ),
               const SizedBox(height: 10),
               Row(
                 children: [
                   drawerList2(
-                      FontAwesomeIcons.carBurst, "Locations", const Center()),
+                      FontAwesomeIcons.car, "Locations", const Center()),
                   const SizedBox(
                     width: 10,
                   ),
                   drawerList2(
-                      FontAwesomeIcons.carTunnel, "Ventes", const Center()),
+                      FontAwesomeIcons.carBurst, "Accidents", const Center()),
                 ],
               ),
               const SizedBox(height: 10),
@@ -310,7 +312,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                             ),
                             TextButton(
                               style: TextButton.styleFrom(
-                                backgroundColor: Constants.secondaryColor,
+                                backgroundColor: AppColors.secondaryColor,
                               ),
                               child: const Text('Oui',
                                   style: TextStyle(color: Colors.white)),
@@ -343,7 +345,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                         borderRadius:
                             const BorderRadius.all(Radius.circular(40)),
                         child: Image.asset(
-                          "assets/images/logo.png",
+                          AppAssets.logoBlueSquare,
                           width: 60,
                         )),
                   ),
@@ -352,5 +354,30 @@ class _DrawerScreenState extends State<DrawerScreen> {
             ),
           );
         });
+  }
+}
+
+class DrawerWidget extends StatelessWidget {
+  const DrawerWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        ZoomDrawer.of(context)!.toggle();
+      },
+      icon: Container(
+          width: 40,
+          height: 40,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(40))),
+          child: FaIcon(
+            size: 20,
+            FontAwesomeIcons.bars,
+            color: AppColors.primaryColor,
+          )),
+    );
   }
 }

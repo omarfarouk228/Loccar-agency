@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:loccar_agency/utils/colors.dart';
 import 'package:provider/provider.dart';
 import 'package:loccar_agency/utils/notifiers.dart';
 
@@ -52,8 +53,7 @@ class MyApp extends StatelessWidget {
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
       statusBarBrightness: Brightness.dark,
-      systemNavigationBarColor: Constants.primaryColor,
-      // systemNavigationBarDividerColor: Colors.white,
+      systemNavigationBarColor: AppColors.primaryColor,
       systemNavigationBarIconBrightness: Brightness.light,
     ));
     return MaterialApp(
@@ -63,12 +63,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: Constants.currentFontFamily,
         primarySwatch: MaterialColor(0xff322975, color),
-        primaryColor: Constants.primaryColor,
+        primaryColor: AppColors.primaryColor,
         useMaterial3: false,
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             backgroundColor: WidgetStateProperty.all(
-              Constants.primaryColor,
+              AppColors.primaryColor,
             ),
             shape: WidgetStateProperty.all(
               const StadiumBorder(),
@@ -79,7 +79,7 @@ class MyApp extends StatelessWidget {
         textButtonTheme: TextButtonThemeData(
           style: ButtonStyle(
             foregroundColor: WidgetStateProperty.all(
-              Constants.primaryColor,
+              AppColors.primaryColor,
             ),
           ),
         ),

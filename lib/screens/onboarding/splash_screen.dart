@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:loccar_agency/screens/auth/login_screen.dart';
+import 'package:loccar_agency/screens/dashboard/dashboard_screen.dart';
 import 'package:loccar_agency/utils/assets.dart';
-import 'package:loccar_agency/utils/constants.dart';
+import 'package:loccar_agency/utils/colors.dart';
 import 'package:loccar_agency/utils/preferences.dart';
 
 import 'onboarding_screen.dart';
@@ -50,7 +50,7 @@ class SplashScreenState extends State<SplashScreen> {
             ],
           ),
         ),
-        backgroundColor: Constants.primaryColor,
+        backgroundColor: AppColors.primaryColor,
         body: Stack(
           alignment: Alignment.center,
           children: [
@@ -95,6 +95,12 @@ class SplashScreenState extends State<SplashScreen> {
             return const OnBoardingScreen();
           }));
         }
+      } else {
+        // ignore: use_build_context_synchronously
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) {
+          return const DashboardScreen();
+        }));
       }
     });
   }
@@ -102,7 +108,7 @@ class SplashScreenState extends State<SplashScreen> {
   headerWidget({required double height}) {
     return Container(
       height: height,
-      //color: Constants.primaryColor,
+      //color: AppColors.primaryColor,
       padding: EdgeInsets.only(top: height * 0.2),
       alignment: Alignment.topCenter,
     );

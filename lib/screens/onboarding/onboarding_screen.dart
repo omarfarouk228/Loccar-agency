@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:loccar_agency/screens/auth/login_screen.dart';
 import 'package:loccar_agency/utils/assets.dart';
-import 'package:loccar_agency/utils/constants.dart';
+import 'package:loccar_agency/utils/colors.dart';
 import 'package:loccar_agency/utils/preferences.dart';
 import 'package:loccar_agency/widgets/custom_widgets.dart';
 
@@ -38,7 +38,7 @@ class OnBoardingScreenState extends State<OnBoardingScreen> {
                 "termes et conditions d'utilisations",
                 style: TextStyle(
                     fontSize: 14,
-                    color: Constants.secondaryColor,
+                    color: AppColors.secondaryColor,
                     decoration: TextDecoration.underline),
               ),
               const SizedBox(
@@ -47,7 +47,7 @@ class OnBoardingScreenState extends State<OnBoardingScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 10, right: 10),
                 child: CustomButton(
-                  color: Constants.primaryColor,
+                  color: AppColors.primaryColor,
                   textColor: Colors.white,
                   text: 'Accepter et continuer',
                   onPressed: () {
@@ -85,7 +85,7 @@ class OnBoardingScreenState extends State<OnBoardingScreen> {
               text: TextSpan(
                 style: TextStyle(
                   fontSize: 20.0,
-                  color: Constants.primaryColor,
+                  color: AppColors.primaryColor,
                 ),
                 children: const <TextSpan>[
                   TextSpan(text: 'Bienvenue dans votre application\n'),
