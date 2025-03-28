@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:loccar_agency/models/vehicule.dart';
+import 'package:loccar_agency/models/vehicle.dart';
 import 'package:loccar_agency/utils/colors.dart';
 import 'package:badges/badges.dart' as badges;
 
 class VehiculeWidget extends StatefulWidget {
-  final ModelVehicule vehicule;
+  final ModelVehicle vehicle;
   final bool badge;
 
   final VoidCallback onPressed;
 
   const VehiculeWidget(
       {super.key,
-      required this.vehicule,
+      required this.vehicle,
       required this.badge,
       required this.onPressed});
 
@@ -38,11 +38,11 @@ class _VehiculeWidgetState extends State<VehiculeWidget> {
                   position: badges.BadgePosition.topEnd(top: -10, end: -5),
                   child: ListTile(
                       title: Text(
-                        "${widget.vehicule.marque}  ${widget.vehicule.model}",
+                        "${widget.vehicle.marque}  ${widget.vehicle.model}",
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle:
-                          Text("Numéro de plaque: ${widget.vehicule.plaque}"),
+                          Text("Numéro de plaque: ${widget.vehicle.plaque}"),
                       leading: CircleAvatar(
                           backgroundColor: AppColors.primaryColor,
                           radius: 25,
@@ -72,10 +72,10 @@ class _VehiculeWidgetState extends State<VehiculeWidget> {
                       )))
               : ListTile(
                   title: Text(
-                    "${widget.vehicule.marque}  ${widget.vehicule.model}",
+                    "${widget.vehicle.marque}  ${widget.vehicle.model}",
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  subtitle: Text("Numéro de plaque: ${widget.vehicule.plaque}"),
+                  subtitle: Text("Numéro de plaque: ${widget.vehicle.plaque}"),
                   leading: CircleAvatar(
                       backgroundColor: AppColors.primaryColor,
                       radius: 25,

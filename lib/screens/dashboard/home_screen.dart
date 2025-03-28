@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:loccar_agency/models/user.dart';
 import 'package:loccar_agency/screens/dashboard/notifications_screen.dart';
 import 'package:loccar_agency/utils/assets.dart';
 import 'package:loccar_agency/utils/colors.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:loccar_agency/utils/constants.dart';
 import 'package:loccar_agency/utils/dimensions.dart';
+import 'package:loccar_agency/utils/preferences.dart';
 import 'package:loccar_agency/widgets/main_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -20,6 +22,20 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int alertNotifications = 0;
   bool showBalance = true;
+  UserModel? user;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _getUser());
+  }
+
+  void _getUser() async {
+    user = await SharedPreferencesHelper.getObject(
+        "user", (json) => UserModel.fromJson(json));
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,44 +124,76 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          elevation: 4,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.primaryColor,
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            padding: const EdgeInsets.all(16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                      user != null
+                          ? Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              elevation: 4,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryColor,
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                padding: const EdgeInsets.all(16),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const Text(
-                                      'Bienvenue,',
-                                      style: TextStyle(
-                                          color: Colors.white70, fontSize: 16),
-                                    ),
-                                    const Text(
-                                      'Aboubacar Rental',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    showBalance
-                                        ? Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                '195 000',
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Bienvenue,',
+                                          style: TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 16),
+                                        ),
+                                        Text(
+                                          user!.responsibleFullName,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        showBalance
+                                            ? Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                    user!.balance.toString(),
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 30,
+                                                      fontFamily: Constants
+                                                          .secondFontFamily,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  Dimensions.horizontalSpacer(
+                                                      5),
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(
+                                                        bottom: 5),
+                                                    child: Text(
+                                                      'F CFA',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            : Text(
+                                                '*********',
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 30,
@@ -154,81 +202,59 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                               ),
-                                              Dimensions.horizontalSpacer(5),
-                                              const Padding(
-                                                padding:
-                                                    EdgeInsets.only(bottom: 5),
-                                                child: Text(
-                                                  'F CFA',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              showBalance = !showBalance;
+                                            });
+                                          },
+                                          child: Row(
+                                            children: [
+                                              const Text(
+                                                'Solde du compte',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.bold,
                                                 ),
                                               ),
+                                              Dimensions.horizontalSpacer(10),
+                                              Container(
+                                                  height: 20,
+                                                  width: 20,
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                      border: Border.all(
+                                                          color: Colors.white)),
+                                                  alignment: Alignment.center,
+                                                  child: FaIcon(
+                                                    !showBalance
+                                                        ? FontAwesomeIcons.eye
+                                                        : FontAwesomeIcons
+                                                            .eyeSlash,
+                                                    color: Colors.white,
+                                                    size: 10,
+                                                  ))
                                             ],
-                                          )
-                                        : Text(
-                                            '*********',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 30,
-                                              fontFamily:
-                                                  Constants.secondFontFamily,
-                                              fontWeight: FontWeight.bold,
-                                            ),
                                           ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          showBalance = !showBalance;
-                                        });
-                                      },
-                                      child: Row(
-                                        children: [
-                                          const Text(
-                                            'Solde du compte',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Dimensions.horizontalSpacer(10),
-                                          Container(
-                                              height: 20,
-                                              width: 20,
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                  border: Border.all(
-                                                      color: Colors.white)),
-                                              alignment: Alignment.center,
-                                              child: FaIcon(
-                                                !showBalance
-                                                    ? FontAwesomeIcons.eye
-                                                    : FontAwesomeIcons.eyeSlash,
-                                                color: Colors.white,
-                                                size: 10,
-                                              ))
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
+                                    CircleAvatar(
+                                      radius: 30,
+                                      backgroundColor: Colors.white,
+                                      child: IconButton(
+                                        icon: Icon(Icons.add,
+                                            color: AppColors.primaryColor),
+                                        onPressed: () {},
+                                      ),
+                                    )
                                   ],
                                 ),
-                                CircleAvatar(
-                                  radius: 30,
-                                  backgroundColor: Colors.white,
-                                  child: IconButton(
-                                    icon: Icon(Icons.add,
-                                        color: AppColors.primaryColor),
-                                    onPressed: () {},
-                                  ),
-                                )
-                              ],
-                            ),
-                          )),
+                              ))
+                          : Container(),
 
                       Dimensions.verticalSpacer(10),
                       // Statistics Row

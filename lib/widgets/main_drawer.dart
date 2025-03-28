@@ -319,8 +319,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                               onPressed: () {
                                 Navigator.of(context, rootNavigator: true)
                                     .pop();
-                                SharedPreferencesHelper.setIntValue(
-                                    "step_auth", 0);
+                                SharedPreferencesHelper.clearAll();
 
                                 Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(

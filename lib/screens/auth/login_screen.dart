@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:loccar_agency/screens/dashboard/dashboard_screen.dart';
+import 'package:loccar_agency/services/auth.dart';
 import 'package:loccar_agency/utils/assets.dart';
 import 'package:loccar_agency/utils/colors.dart';
 import 'package:loccar_agency/utils/dimensions.dart';
-import 'package:loccar_agency/utils/preferences.dart';
-import 'package:loccar_agency/utils/snack_bar_helper.dart';
 import 'package:loccar_agency/widgets/buttons/rounded_button.dart';
 import 'package:loccar_agency/widgets/textfields/custom_password_field.dart';
 import 'package:loccar_agency/widgets/textfields/custom_text_field.dart';
@@ -113,7 +112,7 @@ class LoginScreenState extends State<LoginScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       const Text(
-                                        'Créer un  compte',
+                                        'Connectez-vous',
                                         style: TextStyle(
                                           fontSize: 24,
                                           fontWeight: FontWeight.bold,
@@ -122,7 +121,7 @@ class LoginScreenState extends State<LoginScreen> {
                                       ),
                                       Dimensions.verticalSpacer(10),
                                       Text(
-                                        "Nom *",
+                                        "Adresse mail *",
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyMedium!
@@ -172,7 +171,7 @@ class LoginScreenState extends State<LoginScreen> {
                                                   setState(() {
                                                     isLoading = true;
                                                   });
-                                                  login();
+                                                  login(context);
                                                 }
                                               },
                                             )
@@ -243,25 +242,27 @@ class LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void login() {
-    if (emailController.text == "sogenuvo@gmail.com" &&
-        passwordController.text == "952489") {
-      setState(() {
-        isLoading = false;
-      });
-      SharedPreferencesHelper.setIntValue("step_auth", 1);
+  Future<void> login(context) async {
+    setState(() {
+      isLoading = true;
+    });
+    AuthService loginService = AuthService();
+
+    bool isSuccess = await loginService.login(
+        emailController.text, passwordController.text, context);
+
+    if (isSuccess) {
+      await loginService.getInfos();
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
             builder: (context) => const DashboardScreen(),
           ),
           (route) => false);
-    } else {
-      setState(() {
-        isLoading = false;
-      });
-      SnackBarHelper.showCustomSnackBar(
-          context, "Email ou mot de passe incorrect");
     }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 }
