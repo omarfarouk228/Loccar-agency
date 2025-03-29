@@ -28,7 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _getUser() async {
     user = await SharedPreferencesHelper.getObject(
-        "user", (json) => UserModel.fromJson(json));
+        "user", (json) => UserModel.fromJson2(json));
     setState(() {});
   }
 

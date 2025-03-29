@@ -3,6 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:loccar_agency/screens/dashboard/accidents/accidents_list_screen.dart';
+import 'package:loccar_agency/screens/dashboard/cars/cars_list_screen.dart';
+import 'package:loccar_agency/screens/dashboard/owners/owners_list_screen.dart';
+import 'package:loccar_agency/screens/dashboard/rents/rents_list_screen.dart';
 import 'package:loccar_agency/utils/assets.dart';
 import 'package:loccar_agency/utils/colors.dart';
 import 'package:share_plus/share_plus.dart';
@@ -68,25 +72,25 @@ class _DrawerScreenState extends State<DrawerScreen> {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  drawerList2(
-                      FontAwesomeIcons.users, "Propriétaires", const Center()),
+                  drawerList2(FontAwesomeIcons.users, "Propriétaires",
+                      const OwnersListScreen()),
                   const SizedBox(
                     width: 10,
                   ),
-                  drawerList2(
-                      FontAwesomeIcons.fileInvoice, "Voitures", const Center()),
+                  drawerList2(FontAwesomeIcons.fileInvoice, "Voitures",
+                      const CarsListScreen()),
                 ],
               ),
               const SizedBox(height: 10),
               Row(
                 children: [
-                  drawerList2(
-                      FontAwesomeIcons.car, "Locations", const Center()),
+                  drawerList2(FontAwesomeIcons.car, "Locations",
+                      const RentsListScreen()),
                   const SizedBox(
                     width: 10,
                   ),
-                  drawerList2(
-                      FontAwesomeIcons.carBurst, "Accidents", const Center()),
+                  drawerList2(FontAwesomeIcons.carBurst, "Accidents",
+                      const AccidentsListScreen()),
                 ],
               ),
               const SizedBox(height: 10),

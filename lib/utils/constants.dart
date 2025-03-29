@@ -9,43 +9,6 @@ class Constants {
   static String currentFontFamily = "Lato";
   static String secondFontFamily = "LilitaOne";
 
-  static (String, int, Color, int) getDiffBetweenDates(String expiryDate) {
-    DateTime date1 = DateTime.now();
-    DateTime date2 = DateTime.parse(expiryDate);
-
-    String text = "";
-    int status = 1;
-    Color color = Colors.green;
-    int differenceDays = 0;
-    if (date2.isAfter(date1)) {
-      // Calcul de la différence entre les deux dates
-      Duration difference = date2.difference(date1);
-
-      // Récupération des composantes de la différence
-      int years = difference.inDays ~/ 365;
-      int months = difference.inDays ~/ 30;
-      int days = difference.inDays % 30;
-
-      differenceDays = difference.inDays;
-
-      // Construction du texte à afficher
-      if (years > 0) {
-        text = 'Dans $years ans';
-      } else if (months > 0) {
-        text = 'Dans $months mois';
-      } else if (days > 0) {
-        color = Colors.orange.shade500;
-        text = 'Dans $days jours';
-      }
-    } else {
-      status = 0;
-      text = 'Expirée';
-      color = Colors.green;
-    }
-
-    return (text, status, color, differenceDays);
-  }
-
   static String priceString(price) {
     final numberString = price.toString();
     final numberDigits = List.from(numberString.split(''));

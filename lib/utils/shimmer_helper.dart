@@ -4,23 +4,32 @@ import 'package:loccar_agency/utils/dimensions.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ShimmerHelper {
-  static Widget getShimmerListModel(context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade400,
-      period: const Duration(seconds: 1),
-      highlightColor: AppColors.primaryColor.withOpacity(0.3),
-      child: ListTile(
-        title: Card(
-          child: SizedBox(
-              height: 10, width: Dimensions.getScreenWidth(context) * 0.2),
-        ),
-        subtitle: Card(
-          child: SizedBox(
-              height: 10, width: Dimensions.getScreenWidth(context) * 0.5),
-        ),
-        leading: const CircleAvatar(),
-      ),
-    );
+  static Widget getShimmerListModel(context, {int itemCount = 10}) {
+    return ListView.builder(
+        itemCount: itemCount,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(10),
+        itemBuilder: (context, index) {
+          return Shimmer.fromColors(
+            baseColor: Colors.grey.shade400,
+            period: const Duration(seconds: 1),
+            highlightColor: AppColors.primaryColor.withOpacity(0.3),
+            child: ListTile(
+              title: Card(
+                child: SizedBox(
+                    height: 10,
+                    width: Dimensions.getScreenWidth(context) * 0.2),
+              ),
+              subtitle: Card(
+                child: SizedBox(
+                    height: 10,
+                    width: Dimensions.getScreenWidth(context) * 0.5),
+              ),
+              leading: const CircleAvatar(),
+            ),
+          );
+        });
   }
 
   static Widget getShimmerDividerModel(context) {

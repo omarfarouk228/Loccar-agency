@@ -115,7 +115,10 @@ class FullScreenPageState extends State<FullScreenPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(100),
                 ),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
                 child: Icon(
                   Icons.arrow_back,
                   color: widget.dark ? Colors.white : Colors.black,

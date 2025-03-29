@@ -3,7 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loccar_agency/models/user.dart';
+import 'package:loccar_agency/screens/dashboard/accidents/accidents_list_screen.dart';
+import 'package:loccar_agency/screens/dashboard/breakdowns/breakdowns_list_screen.dart';
+import 'package:loccar_agency/screens/dashboard/cars/cars_list_screen.dart';
+import 'package:loccar_agency/screens/dashboard/maintenances/maintenances_list_screen.dart';
 import 'package:loccar_agency/screens/dashboard/notifications_screen.dart';
+import 'package:loccar_agency/screens/dashboard/owners/owners_list_screen.dart';
+import 'package:loccar_agency/screens/dashboard/rents/rents_list_screen.dart';
 import 'package:loccar_agency/utils/assets.dart';
 import 'package:loccar_agency/utils/colors.dart';
 import 'package:badges/badges.dart' as badges;
@@ -32,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _getUser() async {
     user = await SharedPreferencesHelper.getObject(
-        "user", (json) => UserModel.fromJson(json));
+        "user", (json) => UserModel.fromJson2(json));
     setState(() {});
   }
 
@@ -283,18 +289,42 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisSpacing: 16,
                           crossAxisSpacing: 16,
                           children: [
-                            _buildDashboardCard('Gestion des propriétaires',
-                                AppAssets.ownersIcon, Colors.purple, 0),
-                            _buildDashboardCard('Gestion des Voitures',
-                                AppAssets.carsIcon, Colors.blue, 0),
-                            _buildDashboardCard('Gestion des locations',
-                                AppAssets.rentsIcon, Colors.red, 8),
-                            _buildDashboardCard('Gestion des accidents',
-                                AppAssets.accidentsIcon, Colors.red, 3),
-                            _buildDashboardCard('Gestion des pannes',
-                                AppAssets.breakdownsIcon, Colors.green, 2),
-                            _buildDashboardCard('Gestion de maintenances',
-                                AppAssets.maintenanceIcon, Colors.green, 3),
+                            _buildDashboardCard(
+                                'Gestion des propriétaires',
+                                AppAssets.ownersIcon,
+                                Colors.purple,
+                                0,
+                                const OwnersListScreen()),
+                            _buildDashboardCard(
+                                'Gestion des Voitures',
+                                AppAssets.carsIcon,
+                                Colors.blue,
+                                0,
+                                const CarsListScreen()),
+                            _buildDashboardCard(
+                                'Gestion des locations',
+                                AppAssets.rentsIcon,
+                                Colors.red,
+                                0,
+                                const RentsListScreen()),
+                            _buildDashboardCard(
+                                'Gestion des accidents',
+                                AppAssets.accidentsIcon,
+                                Colors.red,
+                                0,
+                                const AccidentsListScreen()),
+                            _buildDashboardCard(
+                                'Gestion des pannes',
+                                AppAssets.breakdownsIcon,
+                                Colors.green,
+                                0,
+                                const BreakdownsListScreen()),
+                            _buildDashboardCard(
+                                'Gestion de maintenances',
+                                AppAssets.maintenanceIcon,
+                                Colors.green,
+                                0,
+                                const MaintenancesListScreen()),
                           ],
                         ),
                       ),
@@ -362,8 +392,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildDashboardCard(
-      String title, String iconPath, Color color, int notifications) {
+  Widget _buildDashboardCard(String title, String iconPath, Color color,
+      int notifications, Widget screen) {
     return badges.Badge(
         badgeContent: Text(
           "$notifications",
@@ -373,31 +403,37 @@ class _HomeScreenState extends State<HomeScreen> {
         badgeStyle: const badges.BadgeStyle(
             badgeColor: Colors.red, padding: EdgeInsets.all(8)),
         position: badges.BadgePosition.topEnd(top: -10, end: -5),
-        child: Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          elevation: 4,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset(
-                  iconPath,
-                  // colorFilter: const ColorFilter.mode(
-                  //   AppColors.colorBlack,
-                  //   BlendMode.srcIn,
-                  // ),
-                  width: 50,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-              ],
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => screen));
+          },
+          child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            elevation: 4,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    iconPath,
+                    // colorFilter: const ColorFilter.mode(
+                    //   AppColors.colorBlack,
+                    //   BlendMode.srcIn,
+                    // ),
+                    width: 50,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             ),
           ),
         ));

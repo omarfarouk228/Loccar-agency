@@ -138,13 +138,10 @@ class _AuthInterceptor extends Interceptor {
   @override
   Future<void> onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
-    // Check if authentication is required
-    if (options.headers['requiresAuth'] ?? true) {
-      final token = await SharedPreferencesHelper.getValue('auth_token');
+    final token = await SharedPreferencesHelper.getValue('auth_token');
 
-      if (token.isNotEmpty) {
-        options.headers['Authorization'] = 'Bearer $token';
-      }
+    if (token.isNotEmpty) {
+      options.headers['Authorization'] = 'Bearer $token';
     }
 
     handler.next(options);

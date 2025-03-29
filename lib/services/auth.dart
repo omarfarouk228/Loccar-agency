@@ -24,7 +24,8 @@ class AuthService {
             context, "Email ou mot de passe incorrect");
       } else {
         await _dioHelper.saveToken(response.data['data'][0]['token']);
-
+        await SharedPreferencesHelper.setIntValue(
+            "id", response.data['data'][0]['id']);
         SharedPreferencesHelper.setIntValue("step_auth", 1);
         return true;
       }
@@ -44,8 +45,8 @@ class AuthService {
         '/agencies/$agencyId',
       );
 
-      debugPrint("Response: ${response.data}");
       if (response.data["responseCode"] == "0") {
+        debugPrint("Response: ${response.data["data"][0]['country']['name']}");
         await SharedPreferencesHelper.saveObject(
             "user", UserModel.fromJson(response.data['data'][0]));
       }
