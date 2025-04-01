@@ -11,8 +11,11 @@ import 'package:loccar_agency/utils/constants.dart';
 import 'package:loccar_agency/utils/dimensions.dart';
 import 'package:loccar_agency/utils/helpers.dart';
 import 'package:loccar_agency/utils/snack_bar_helper.dart';
+import 'package:loccar_agency/widgets/buttons/rounded_button.dart';
 import 'package:loccar_agency/widgets/custom_cached_network_image.dart';
 import 'package:loccar_agency/widgets/floating_action_buttons.dart';
+import 'package:loccar_agency/widgets/textfields/custom_dropdown_field.dart';
+import 'package:loccar_agency/widgets/textfields/custom_text_field.dart';
 
 class CarDetailsScreen extends StatefulWidget {
   final CarModel car;
@@ -23,6 +26,17 @@ class CarDetailsScreen extends StatefulWidget {
 }
 
 class _CarDetailsScreenState extends State<CarDetailsScreen> {
+  GlobalKey<FormState> keyForm = GlobalKey();
+  TextEditingController amountController = TextEditingController();
+  TextEditingController reasonController = TextEditingController();
+
+  List<String> sourceEntries = [
+    "Location",
+    "Course",
+    "Vente",
+  ];
+  String selectedSource = "Location";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +70,7 @@ class _CarDetailsScreenState extends State<CarDetailsScreen> {
               left: 0,
               right: 0,
               child: CustomFloatingActionButtons(
-                iconsData: const [Icons.edit, Icons.delete],
+                iconsData: const [Icons.edit, Icons.delete, Icons.add],
                 callbacks: [
                   () {
                     Navigator.push(
@@ -67,9 +81,18 @@ class _CarDetailsScreenState extends State<CarDetailsScreen> {
                   },
                   () {
                     showDeleteDialog(context);
+                  },
+                  () {
+                    BottomSheetHelper.showCustomBottomSheet(
+                        context, "Faire un dépôt", _buildDepositForm(context),
+                        heightRatio: 0.6);
                   }
                 ],
-                colors: [AppColors.secondaryColor, Colors.red],
+                colors: [
+                  AppColors.secondaryColor,
+                  Colors.red,
+                  AppColors.thirdyColor
+                ],
               ))
         ],
       ),
@@ -337,8 +360,8 @@ class _CarDetailsScreenState extends State<CarDetailsScreen> {
 
   Widget _buildPaymentsSection() {
     return CustomAccordion(
-        title: 'Paiements',
-        subTitle: 'Historique des paiements',
+        title: 'Historique de Paiements',
+        subTitle: "Consultez l'historique des paiements de la voiture",
         headerBackgroundColor: AppColors.thirdyColor,
         titleStyle: const TextStyle(
           fontSize: 18,
@@ -409,5 +432,94 @@ class _CarDetailsScreenState extends State<CarDetailsScreen> {
             "Une erreur s'est produite lors de la suppression. Veuillez réessayer.");
       }
     });
+  }
+
+  Widget _buildDepositForm(context) {
+    return Form(
+      key: keyForm,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Dimensions.verticalSpacer(15),
+        const Text(
+            "Renseignez les informations du dépôt d'argent que vous voulez effectuer."),
+        Dimensions.verticalSpacer(15),
+        const Text(
+          "Montant à déposer *",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        Dimensions.verticalSpacer(5),
+        CustomTextField(
+          controller: amountController,
+          value: amountController.text,
+          hintText: 'Saisissez le montant',
+          maxLength: 30,
+          keyboardType: TextInputType.number,
+          errorMessage: "Le montant est obligatoire",
+        ),
+        Dimensions.verticalSpacer(15),
+        const Text(
+          "Source d'entrée *",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        Dimensions.verticalSpacer(5),
+        CustomDropButton<String>(
+          hintText: 'Choisir',
+          options: sourceEntries,
+          onChanged: (value) {
+            setState(() {
+              selectedSource = value.toString();
+            });
+          },
+          active: true,
+          currentValue: selectedSource,
+          displayStringForOption: (String item) => item,
+        ),
+        Dimensions.verticalSpacer(15),
+        const Text(
+          "Motif du dépôt *",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        Dimensions.verticalSpacer(5),
+        CustomTextField(
+          controller: reasonController,
+          value: reasonController.text,
+          hintText: 'Saisissez le motif',
+          maxLength: 100,
+          errorMessage: "Le motif est obligatoire",
+        ),
+        Dimensions.verticalSpacer(15),
+        RoundedButton(
+          isActive: true,
+          color: AppColors.primaryColor,
+          textColor: Colors.white,
+          text: 'Confirmer le dépôt',
+          onPressed: () async {
+            if (keyForm.currentState!.validate()) {
+              Navigator.pop(context);
+              BottomSheetHelper.showLoadingModalSheet(
+                  context, "Traitement du dépôt en cours...");
+              bool isSuccess = await CarService().makeDeposit(
+                amount: double.parse(amountController.text),
+                carId: widget.car.id,
+                entrySource: selectedSource,
+                wording: reasonController.text,
+                plateCountry: widget.car.plateCountry!,
+                plateSeries: widget.car.plateSeries!,
+                plateNumber: widget.car.plateNumber!,
+                ownerId: widget.car.ownerId!,
+              );
+              Navigator.pop(context);
+              if (isSuccess) {
+                SnackBarHelper.showCustomSnackBar(
+                    context, "Dépôt effectué avec succès.",
+                    backgroundColor: Colors.green);
+              } else {
+                SnackBarHelper.showCustomSnackBar(context,
+                    "Une erreur s'est produite lors du dépôt. Veuillez réessayer.");
+              }
+            }
+          },
+        )
+      ]),
+    );
   }
 }

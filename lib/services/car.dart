@@ -213,4 +213,37 @@ class CarService {
       return false;
     }
   }
+
+  Future<bool> makeDeposit(
+      {required int carId,
+      required double amount,
+      required String wording,
+      required String entrySource,
+      required String plateCountry,
+      required String plateSeries,
+      required String plateNumber,
+      required int ownerId}) async {
+    try {
+      int agencyId = await SharedPreferencesHelper.getIntValue("agencyId");
+      final response = await _dioHelper.put(
+        '/cars/$carId',
+        data: {
+          'plateCountry': plateCountry,
+          'plateSeries': plateSeries,
+          'plateNumber': plateNumber,
+          'ownerId': ownerId,
+          'agencyId': agencyId,
+          'amount': amount,
+          'wording': wording,
+          'entrySource': entrySource
+        },
+      );
+      debugPrint("Response: ${response.data}");
+
+      return response.data["responseCode"] == "0";
+    } catch (e) {
+      debugPrint("Adding owner error: $e");
+      return false;
+    }
+  }
 }
