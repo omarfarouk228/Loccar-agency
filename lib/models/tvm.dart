@@ -21,8 +21,12 @@ class TvmModel {
       tvmNumber: json['tvmNumber'],
       carId: json['carId'],
       file: json['file'],
-      issueDate: DateTime.parse(json['issueDate']),
-      expiryDate: DateTime.parse(json['expiryDate']),
+      issueDate: json['issueDate'] == null
+          ? DateTime.now()
+          : DateTime.parse(json['issueDate']),
+      expiryDate: json['expiryDate'] == null
+          ? DateTime.now()
+          : DateTime.parse(json['expiryDate']),
     );
   }
 }

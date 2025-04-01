@@ -13,15 +13,17 @@ class OwnerModel {
   final String idCardNumber;
   final String idCard;
   final String? photo;
-  final String socialReason;
-  final String professionalCardNumber;
+  final String? socialReason;
+  final String? professionalCardNumber;
   final String? professionalCard;
-  final String responsibleFullName;
+  final String? responsibleFullName;
   final String? fullAddress;
+  final String? geolocalisation;
   final String password;
   final DateTime lastLogin;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final int? carCount;
 
   OwnerModel({
     required this.id,
@@ -38,15 +40,17 @@ class OwnerModel {
     required this.idCardNumber,
     required this.idCard,
     this.photo,
-    required this.socialReason,
-    required this.professionalCardNumber,
+    this.socialReason,
+    this.professionalCardNumber,
     this.professionalCard,
-    required this.responsibleFullName,
+    this.responsibleFullName,
     this.fullAddress,
+    this.geolocalisation,
     required this.password,
     required this.lastLogin,
     required this.createdAt,
     required this.updatedAt,
+    this.carCount,
   });
 
   factory OwnerModel.fromJson(Map<String, dynamic> json) => OwnerModel(
@@ -69,10 +73,12 @@ class OwnerModel {
         professionalCard: json['prefessionalCard'],
         responsibleFullName: json['responsibleFullName'],
         fullAddress: json['fullAddress'],
+        geolocalisation: json['geolocalisation'],
         password: json['password'],
         lastLogin: DateTime.parse(json['lastLogin']),
         createdAt: DateTime.parse(json['createdAt']),
         updatedAt: DateTime.parse(json['updatedAt']),
+        carCount: json['carCount'] ?? 0,
       );
 
   Map<String, dynamic> toJson() => {
@@ -95,9 +101,11 @@ class OwnerModel {
         'prefessionalCard': professionalCard,
         'responsibleFullName': responsibleFullName,
         'fullAddress': fullAddress,
+        'geolocalisation': geolocalisation,
         'password': password,
         'lastLogin': lastLogin.toIso8601String(),
         'createdAt': createdAt.toIso8601String(),
         'updatedAt': updatedAt.toIso8601String(),
+        'carCount': carCount
       };
 }

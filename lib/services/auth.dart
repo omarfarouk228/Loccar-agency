@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:loccar_agency/models/user.dart';
+import 'package:loccar_agency/models/user_stat.dart';
 import 'package:loccar_agency/services/dio.dart';
 import 'package:loccar_agency/utils/preferences.dart';
 import 'package:loccar_agency/utils/snack_bar_helper.dart';
@@ -40,15 +41,20 @@ class AuthService {
 
   Future<void> getInfos() async {
     try {
-      int agencyId = await SharedPreferencesHelper.getIntValue("id");
+      int userId = await SharedPreferencesHelper.getIntValue("id");
       final response = await _dioHelper.get(
-        '/agencies/$agencyId',
+        '/agencies/$userId/single',
       );
 
       if (response.data["responseCode"] == "0") {
-        debugPrint("Response: ${response.data["data"][0]['country']['name']}");
+        debugPrint("Response: ${response.data["data"]}");
         await SharedPreferencesHelper.saveObject(
             "user", UserModel.fromJson(response.data['data'][0]));
+        await SharedPreferencesHelper.saveObject(
+            "user_stat", UserStatModel.fromJson(response.data['data'][1]));
+
+        await SharedPreferencesHelper.setIntValue(
+            "agencyId", response.data["data"][0]['id']);
       }
     } catch (e) {
       debugPrint("Get info error: $e");

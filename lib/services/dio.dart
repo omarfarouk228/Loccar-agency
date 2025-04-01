@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:loccar_agency/utils/constants.dart';
 import 'package:loccar_agency/utils/preferences.dart';
 import 'package:logging/logging.dart';
@@ -62,6 +63,8 @@ class DioHelper {
     bool requiresAuth = true,
   }) async {
     try {
+      debugPrint("Request url: $path");
+      debugPrint("Query parameters: ${queryParameters ?? {}}");
       return await _dio.get(
         path,
         queryParameters: queryParameters,
@@ -80,18 +83,63 @@ class DioHelper {
     bool requiresAuth = true,
   }) async {
     try {
+      debugPrint("Request url: $path");
+      debugPrint("Query parameters: ${queryParameters ?? {}}");
+      debugPrint("Data: ${data ?? {}}");
       return await _dio.post(
         path,
         data: data,
         queryParameters: queryParameters,
       );
     } on DioException catch (e) {
+      debugPrint("DioException status code: ${e.response?.statusCode}");
+      debugPrint("DioException response data: ${e.response?.data}");
+      debugPrint("DioException headers: ${e.response?.headers}");
+      debugPrint("DioException message: ${e.message}");
       _logger.severe('POST request error', e);
       rethrow;
     }
   }
 
-  // Additional methods for PUT, DELETE as needed
+  // Generic PUT request
+  Future<Response> put(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    bool requiresAuth = true,
+  }) async {
+    try {
+      debugPrint("Request url: $path");
+      debugPrint("Query parameters: ${queryParameters ?? {}}");
+      return await _dio.put(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+      );
+    } on DioException catch (e) {
+      _logger.severe('PUT request error', e);
+      rethrow;
+    }
+  }
+
+  // Generic DELETE request
+  Future<Response> delete(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    bool requiresAuth = true,
+  }) async {
+    try {
+      debugPrint("Request url: $path");
+      debugPrint("Query parameters: ${queryParameters ?? {}}");
+      return await _dio.delete(
+        path,
+        queryParameters: queryParameters,
+      );
+    } on DioException catch (e) {
+      _logger.severe('DELETE request error', e);
+      rethrow;
+    }
+  }
 }
 
 class _LoggingInterceptor extends Interceptor {

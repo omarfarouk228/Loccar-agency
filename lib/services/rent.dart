@@ -11,9 +11,9 @@ class RentService {
     List dates = [];
 
     try {
-      int agencyId = await SharedPreferencesHelper.getIntValue("id");
+      int userId = await SharedPreferencesHelper.getIntValue("id");
       final response = await _dioHelper.get(
-        '/rents/agencies/$agencyId',
+        '/rents/agencies/$userId',
       );
 
       debugPrint("Response: ${response.data}");

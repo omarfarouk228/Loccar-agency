@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:loccar_agency/utils/colors.dart';
 
-class CustomTextField extends StatefulWidget {
-  const CustomTextField({
+class CustomDatePicker extends StatefulWidget {
+  const CustomDatePicker({
     required String hintText,
     required TextEditingController controller,
     String? errorMessage,
     int maxLength = 15,
     int maxLines = 1,
+    bool onlyDate = true,
     int typeBorder = 1,
     double height = 50,
     Color background = AppColors.placeholderBg,
@@ -18,6 +19,7 @@ class CustomTextField extends StatefulWidget {
     bool autofocus = false,
     TextInputType keyboardType = TextInputType.text,
     Widget? suffixIcon,
+    required onDatePicked,
     super.key,
   })  : _hintText = hintText,
         _padding = padding,
@@ -32,6 +34,8 @@ class CustomTextField extends StatefulWidget {
         _errorMessage = errorMessage,
         _autofocus = autofocus,
         _keyboardType = keyboardType,
+        _onDatePicked = onDatePicked,
+        _onlyDate = onlyDate,
         _suffixIcon = suffixIcon;
 
   final String _hintText;
@@ -48,12 +52,14 @@ class CustomTextField extends StatefulWidget {
   final TextInputType _keyboardType;
   final String? _errorMessage;
   final Widget? _suffixIcon;
+  final bool _onlyDate;
+  final Function(DateTime?) _onDatePicked;
 
   @override
-  State<CustomTextField> createState() => _CustomTextFieldState();
+  State<CustomDatePicker> createState() => _CustomDatePickerState();
 }
 
-class _CustomTextFieldState extends State<CustomTextField> {
+class _CustomDatePickerState extends State<CustomDatePicker> {
   @override
   void initState() {
     super.initState();
@@ -78,7 +84,29 @@ class _CustomTextFieldState extends State<CustomTextField> {
         maxLines: widget._maxLines,
         readOnly: !widget._enabled,
         autofocus: widget._autofocus,
-        // enabled: widget._enabled,
+        onTap: () async {
+          DateTime? pickedDate = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2101),
+          );
+          if (!widget._onlyDate) {
+            TimeOfDay? pickedTime = await showTimePicker(
+              // ignore: use_build_context_synchronously
+              context: context,
+              initialTime: TimeOfDay.now(),
+            );
+            pickedDate = DateTime(
+              pickedDate!.year,
+              pickedDate.month,
+              pickedDate.day,
+              pickedTime!.hour,
+              pickedTime.minute,
+            );
+          }
+          widget._onDatePicked(pickedDate);
+        },
         keyboardType: widget._keyboardType,
         inputFormatters: [
           LengthLimitingTextInputFormatter(widget._maxLength),

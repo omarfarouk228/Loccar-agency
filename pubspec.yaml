@@ -43,6 +43,10 @@ dependencies:
   logging:
   shimmer:
   custom_accordion: ^1.0.0
+  another_flushbar:
+  http_parser:
+  path_provider:
+  dropdown_search:
 
 dev_dependencies:
   flutter_test:

@@ -14,6 +14,7 @@ class UserModel {
   final String? lastBillingDate;
   final String? lastLogin;
   final String? country;
+  final String? countryCode;
   final int? countryId;
   final int? administratorId;
 
@@ -34,6 +35,7 @@ class UserModel {
     this.lastLogin,
     this.countryId,
     this.country,
+    this.countryCode,
     this.administratorId,
   });
 
@@ -55,6 +57,7 @@ class UserModel {
         'last_login': lastLogin,
         'countryId': countryId,
         'country': country,
+        'countryCode': countryCode,
         'administratorId': administratorId,
       };
 
@@ -76,6 +79,7 @@ class UserModel {
       lastLogin: json['last_login'],
       countryId: json['countryId'],
       country: json['country']['name'],
+      countryCode: json['country']['phone_code'],
       administratorId: json['administratorId']);
 
   // Create object from JSON
@@ -96,5 +100,6 @@ class UserModel {
       lastLogin: json['last_login'],
       countryId: json['countryId'],
       country: json['country'],
+      countryCode: json['countryCode'],
       administratorId: json['administratorId']);
 }

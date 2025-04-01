@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:loccar_agency/models/assurance.dart';
 import 'package:loccar_agency/models/car_photo.dart';
 import 'package:loccar_agency/models/owner.dart';
@@ -134,6 +135,7 @@ class CarModel {
       this.owner});
 
   factory CarModel.fromJson(Map<String, dynamic> json) {
+    debugPrint("json: $json['id]");
     List<CarPhotoModel> photos = [];
     List<PaymentModel> paymentsList = [];
     // List<AccidentModel> accidentsList = [];
