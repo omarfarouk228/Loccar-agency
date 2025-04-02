@@ -193,18 +193,13 @@ class _CarsListScreenState extends State<CarsListScreen> {
                                       "${car.brand} ${car.model} ${car.year}"),
                                   subtitle: Text(
                                       "${car.plateCountry} ${car.plateSeries} ${car.plateNumber} - ${car.color}"),
-                                  trailing: SizedButton(
-                                    width: 50,
-                                    height: 35,
-                                    color: car.isOnLocation
-                                        ? Colors.green
-                                        : Colors.red,
-                                    child: Text(
-                                      car.isOnLocation ? "Oui" : "Non",
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
-                                    ),
+                                  trailing: Text(
+                                    car.isOnLocation ? "Oui" : "Non",
+                                    style: TextStyle(
+                                        color: car.isOnLocation
+                                            ? Colors.green
+                                            : Colors.grey,
+                                        fontWeight: FontWeight.bold),
                                   )),
                             ),
                           );
