@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:loccar_agency/models/transaction.dart';
+import 'package:loccar_agency/models/payment.dart';
 import 'package:loccar_agency/services/dio.dart';
+import 'package:loccar_agency/utils/preferences.dart';
 
-class TransactionService {
+class PaymentService {
   final DioHelper _dioHelper = DioHelper();
 
-  Future<(List<TransactionModel>, List)> fetchRents() async {
-    List<TransactionModel> transactions = [];
+  Future<(List<PaymentModel>, List)> fetchPayments() async {
+    int userId = await SharedPreferencesHelper.getIntValue("id");
+    List<PaymentModel> transactions = [];
     List dates = [];
 
     try {
       final response = await _dioHelper.get(
-        '/transactions',
+        '/payments/agency/$userId/list',
       );
 
       debugPrint("Response: ${response.data}");
 
       if (response.data["responseCode"] == "0") {
         for (var rent in response.data["data"]) {
-          transactions.add(TransactionModel.fromJson(rent));
+          transactions.add(PaymentModel.fromJson(rent));
         }
 
         dates = response.data["data"]
@@ -46,17 +48,5 @@ class TransactionService {
       debugPrint("Get info error: $e");
     }
     return (transactions, dates);
-  }
-
-  Future<bool> handleTransaction({required String url}) async {
-    try {
-      final response = await _dioHelper.get(url);
-      debugPrint("Response: ${response.data}");
-
-      return response.data["responseCode"] == "0";
-    } catch (e) {
-      debugPrint("Update transaction error: $e");
-      return false;
-    }
   }
 }

@@ -82,23 +82,24 @@ class _CustomDatePickerState extends State<CustomDatePicker> {
       alignment: Alignment.centerLeft,
       child: TextFormField(
         maxLines: widget._maxLines,
-        readOnly: !widget._enabled,
+        readOnly: true,
         autofocus: widget._autofocus,
         onTap: () async {
+          if (!widget._enabled) return;
           DateTime? pickedDate = await showDatePicker(
             context: context,
             initialDate: DateTime.now(),
             firstDate: DateTime(2000),
             lastDate: DateTime(2101),
           );
-          if (!widget._onlyDate) {
+          if (!widget._onlyDate && pickedDate != null) {
             TimeOfDay? pickedTime = await showTimePicker(
               // ignore: use_build_context_synchronously
               context: context,
               initialTime: TimeOfDay.now(),
             );
             pickedDate = DateTime(
-              pickedDate!.year,
+              pickedDate.year,
               pickedDate.month,
               pickedDate.day,
               pickedTime!.hour,

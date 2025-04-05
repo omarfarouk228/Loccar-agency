@@ -63,8 +63,7 @@ class CarModel {
   final DateTime updatedAt;
   final List<CarPhotoModel> carPhotos;
   final List<PaymentModel> payments;
-  // final List<AccidentModel> accidents;
-  // final List<MaintenanceModel> maintenances;
+
   final List<AssuranceModel> assurances;
   final List<TechnicalVisitModel> technicalVisits;
   final List<TvmModel> tvms;
@@ -127,8 +126,6 @@ class CarModel {
       required this.updatedAt,
       required this.carPhotos,
       required this.payments,
-      // required this.accidents,
-      // required this.maintenances,
       required this.assurances,
       required this.technicalVisits,
       required this.tvms,
@@ -138,8 +135,7 @@ class CarModel {
     debugPrint("json: $json['id]");
     List<CarPhotoModel> photos = [];
     List<PaymentModel> paymentsList = [];
-    // List<AccidentModel> accidentsList = [];
-    // List<MaintenanceModel> maintenancesList = [];
+
     List<AssuranceModel> assurancesList = [];
     List<TechnicalVisitModel> technicalVisitsList = [];
     List<TvmModel> tvmsList = [];
@@ -155,18 +151,6 @@ class CarModel {
         paymentsList.add(PaymentModel.fromJson(payment));
       }
     }
-
-    // if (json['accidents'] != null) {
-    //   for (var accident in json['accidents']) {
-    //     accidentsList.add(AccidentModel.fromJson(accident));
-    //   }
-    // }
-
-    // if (json['maintenances'] != null) {
-    //   for (var maintenance in json['maintenances']) {
-    //     maintenancesList.add(MaintenanceModel.fromJson(maintenance));
-    //   }
-    // }
 
     if (json['assurances'] != null) {
       for (var assurance in json['assurances']) {

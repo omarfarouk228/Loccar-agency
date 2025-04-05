@@ -1,6 +1,6 @@
 class PaymentModel {
   final int id;
-  final int carId;
+  final int? carId;
   final int? ownerId;
   final int agencyId;
   final int ownerState;
@@ -10,7 +10,7 @@ class PaymentModel {
   final String channel;
   final String operation;
   final String wording;
-  final String entrySource;
+  final String? entrySource;
   final String? status;
   final String? fullName;
   final String? phoneNumber;
@@ -19,7 +19,7 @@ class PaymentModel {
 
   PaymentModel({
     required this.id,
-    required this.carId,
+    this.carId,
     this.ownerId,
     required this.agencyId,
     required this.ownerState,
@@ -29,7 +29,7 @@ class PaymentModel {
     required this.channel,
     required this.operation,
     required this.wording,
-    required this.entrySource,
+    this.entrySource,
     this.status,
     this.fullName,
     this.phoneNumber,

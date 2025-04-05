@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:loccar_agency/utils/colors.dart';
 import 'package:loccar_agency/widgets/buttons/sized_button.dart';
 
 class CustomFloatingActionButtons extends StatelessWidget {
-  final List<IconData> iconsData;
+  final List<dynamic> iconsData;
   final List<VoidCallback> callbacks;
   final List<Color> colors;
 
@@ -38,11 +39,20 @@ class CustomFloatingActionButtons extends StatelessWidget {
                                 ? colors[iconsData.indexOf(iconData)]
                                 : AppColors.secondaryColor,
                             onPressed: callbacks[iconsData.indexOf(iconData)],
-                            child: Icon(
-                              iconData,
-                              color: Colors.white,
-                              size: 17,
-                            ),
+                            child: (iconData is IconData)
+                                ? Icon(
+                                    iconData,
+                                    color: Colors.white,
+                                    size: 17,
+                                  )
+                                : SvgPicture.asset(
+                                    iconData,
+                                    colorFilter: const ColorFilter.mode(
+                                      Colors.white,
+                                      BlendMode.srcIn,
+                                    ),
+                                    width: 20,
+                                  ),
                           ),
                         ))
                     .toList()),

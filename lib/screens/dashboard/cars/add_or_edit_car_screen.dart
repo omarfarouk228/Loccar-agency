@@ -4,10 +4,13 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:loccar_agency/models/assurance.dart';
 import 'package:loccar_agency/models/car.dart';
 import 'package:loccar_agency/models/category.dart';
 import 'package:loccar_agency/models/country.dart';
 import 'package:loccar_agency/models/owner.dart';
+import 'package:loccar_agency/models/technical_visit.dart';
+import 'package:loccar_agency/models/tvm.dart';
 import 'package:loccar_agency/services/car.dart';
 import 'package:loccar_agency/services/other.dart';
 import 'package:loccar_agency/services/owner.dart';
@@ -114,6 +117,8 @@ class _AddOrEditCarScreenState extends State<AddOrEditCarScreen> {
   TextEditingController tvmIssueDateController = TextEditingController();
   TextEditingController tvmExpiryDateController = TextEditingController();
 
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -126,6 +131,10 @@ class _AddOrEditCarScreenState extends State<AddOrEditCarScreen> {
     owners = await OwnerService().fetchOwners();
     categories = await CarService().fetchCategories();
     countriesCode = await OtherService().fetchCountries();
+
+    setState(() {
+      isLoading = false;
+    });
 
     if (widget.car != null) {
       selectedOwner =
@@ -169,27 +178,36 @@ class _AddOrEditCarScreenState extends State<AddOrEditCarScreen> {
       countDaysFeatureController.text = widget.car?.popularDays == null
           ? ""
           : widget.car?.popularDays.toString() ?? "";
-      assuranceIssueDateController.text = widget.car?.assuranceIssueDate == null
-          ? ""
-          : widget.car?.assuranceIssueDate.toString() ?? "";
-      assuranceExpiryDateController.text =
-          widget.car?.assuranceExpiryDate == null
-              ? ""
-              : widget.car?.assuranceExpiryDate.toString() ?? "";
-      technicalVisitIssueDateController.text =
-          widget.car?.technicalVisitIssueDate == null
-              ? ""
-              : widget.car?.technicalVisitIssueDate.toString() ?? "";
-      technicalVisitExpiryDateController.text =
-          widget.car?.technicalVisitExpiryDate == null
-              ? ""
-              : widget.car?.technicalVisitExpiryDate.toString() ?? "";
-      tvmIssueDateController.text = widget.car?.tvmIssueDate == null
-          ? ""
-          : widget.car?.tvmIssueDate.toString() ?? "";
-      tvmExpiryDateController.text = widget.car?.tvmExpiryDate == null
-          ? ""
-          : widget.car?.tvmExpiryDate.toString() ?? "";
+
+      if (widget.car?.assurances.isNotEmpty ?? false) {
+        AssuranceModel assurance = widget.car!.assurances.first;
+        assuranceIssueDateController.text =
+            Helpers.formatDateTimeToDate(assurance.issueDate);
+        assuranceExpiryDateController.text =
+            Helpers.formatDateTimeToDate(assurance.expiryDate);
+        assuranceFile = await Helpers.createFileFromRemoteUrl(
+            "${Constants.baseUrl}/${assurance.file}");
+      }
+
+      if (widget.car?.technicalVisits.isNotEmpty ?? false) {
+        TechnicalVisitModel technicalVisit = widget.car!.technicalVisits.first;
+        technicalVisitIssueDateController.text =
+            Helpers.formatDateTimeToDate(technicalVisit.issueDate);
+        technicalVisitExpiryDateController.text =
+            Helpers.formatDateTimeToDate(technicalVisit.expiryDate);
+        technicalVisitFile = await Helpers.createFileFromRemoteUrl(
+            "${Constants.baseUrl}/${technicalVisit.file}");
+      }
+
+      if (widget.car?.tvms.isNotEmpty ?? false) {
+        TvmModel tvm = widget.car!.tvms.first;
+        tvmIssueDateController.text =
+            Helpers.formatDateTimeToDate(tvm.issueDate);
+        tvmExpiryDateController.text =
+            Helpers.formatDateTimeToDate(tvm.expiryDate);
+        tvmFile = await Helpers.createFileFromRemoteUrl(
+            "${Constants.baseUrl}/${tvm.file}");
+      }
 
       grayCardFile = await Helpers.createFileFromRemoteUrl(
           "${Constants.baseUrl}/${widget.car!.grayCard}");
@@ -209,64 +227,77 @@ class _AddOrEditCarScreenState extends State<AddOrEditCarScreen> {
         title: Text(
             widget.car == null ? "Ajouter une voiture" : "Editer une voiture"),
       ),
-      body: CoolStepper(
-          showErrorSnackbar: true,
-          onCompleted: () {
-            handleCarForm(context);
-          },
-          config: const CoolStepperConfig(
-              backText: "Précédent",
-              nextText: "Suivant",
-              finalText: "Terminer",
-              stepText: "Étape",
-              ofText: "sur"),
-          steps: [
-            CoolStep(
-                title: "Étape 1",
-                subtitle: "Veuillez renseigner les informations de la voiture",
-                content: _buildStep1Form(),
-                validation: () {
-                  if (!step1KeyForm.currentState!.validate() ||
-                      grayCardFile == null ||
-                      selectedOwner == null ||
-                      selectedCategory == null) {
-                    return "Veuillez renseigner tous les champs";
-                  }
-                  return null;
-                }),
-            CoolStep(
-                title: "Étape 2",
-                subtitle: "Veuillez renseigner les informations de l'assurance",
-                content: _buildStep2Form(),
-                validation: () {
-                  if (!step2KeyForm.currentState!.validate()) {
-                    return "Veuillez renseigner tous les champs";
-                  }
+      body: isLoading
+          ? const Center(
+              child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Chargement des données..."),
+                SizedBox(height: 20),
+                CircularProgressIndicator(),
+              ],
+            ))
+          : CoolStepper(
+              showErrorSnackbar: true,
+              onCompleted: () {
+                handleCarForm(context);
+              },
+              config: const CoolStepperConfig(
+                  backText: "Précédent",
+                  nextText: "Suivant",
+                  finalText: "Terminer",
+                  stepText: "Étape",
+                  ofText: "sur"),
+              steps: [
+                  CoolStep(
+                      title: "Étape 1",
+                      subtitle:
+                          "Veuillez renseigner les informations de la voiture",
+                      content: _buildStep1Form(),
+                      validation: () {
+                        if (!step1KeyForm.currentState!.validate() ||
+                            grayCardFile == null ||
+                            selectedOwner == null ||
+                            selectedCategory == null) {
+                          return "Veuillez renseigner tous les champs";
+                        }
+                        return null;
+                      }),
+                  CoolStep(
+                      title: "Étape 2",
+                      subtitle:
+                          "Veuillez renseigner les informations de l'assurance",
+                      content: _buildStep2Form(),
+                      validation: () {
+                        if (!step2KeyForm.currentState!.validate()) {
+                          return "Veuillez renseigner tous les champs";
+                        }
 
-                  return null;
-                }),
-            CoolStep(
-                title: "Étape 3",
-                subtitle:
-                    "Veuillez renseigner les informations de la visite technique",
-                content: _buildStep3Form(),
-                validation: () {
-                  if (!step3KeyForm.currentState!.validate()) {
-                    return "Veuillez renseigner tous les champs";
-                  }
-                  return null;
-                }),
-            CoolStep(
-                title: "Étape 4",
-                subtitle: "Veuillez renseigner les informations de la TVM",
-                content: _buildStep4Form(),
-                validation: () {
-                  if (!step4KeyForm.currentState!.validate()) {
-                    return "Veuillez renseigner tous les champs";
-                  }
-                  return null;
-                }),
-          ]),
+                        return null;
+                      }),
+                  CoolStep(
+                      title: "Étape 3",
+                      subtitle:
+                          "Veuillez renseigner les informations de la visite technique",
+                      content: _buildStep3Form(),
+                      validation: () {
+                        if (!step3KeyForm.currentState!.validate()) {
+                          return "Veuillez renseigner tous les champs";
+                        }
+                        return null;
+                      }),
+                  CoolStep(
+                      title: "Étape 4",
+                      subtitle:
+                          "Veuillez renseigner les informations de la TVM",
+                      content: _buildStep4Form(),
+                      validation: () {
+                        if (!step4KeyForm.currentState!.validate()) {
+                          return "Veuillez renseigner tous les champs";
+                        }
+                        return null;
+                      }),
+                ]),
     );
   }
 
@@ -670,14 +701,17 @@ class _AddOrEditCarScreenState extends State<AddOrEditCarScreen> {
                                   controller: startDateFeatureController,
                                   value: startDateFeatureController.text,
                                   hintText: 'JJ/MM/AAAA HH:MM',
-                                  enabled: false,
+                                  enabled: true,
                                   onlyDate: false,
                                   maxLength: 2,
                                   onDatePicked: (value) {
-                                    setState(() {
-                                      startDateFeatureController.text =
-                                          Helpers.formatDateTimeToString(value);
-                                    });
+                                    if (value != null) {
+                                      setState(() {
+                                        startDateFeatureController.text =
+                                            Helpers.formatDateTimeToString(
+                                                value);
+                                      });
+                                    }
                                   }),
                             ])),
                         Dimensions.horizontalSpacer(10),
@@ -1070,13 +1104,15 @@ class _AddOrEditCarScreenState extends State<AddOrEditCarScreen> {
               controller: assuranceIssueDateController,
               value: assuranceIssueDateController.text,
               hintText: 'JJ/MM/AAAA',
-              enabled: false,
+              enabled: true,
               maxLength: 2,
               onDatePicked: (value) {
-                setState(() {
-                  assuranceIssueDateController.text =
-                      Helpers.formatDateTimeToDate(value!, separator: "/");
-                });
+                if (value != null) {
+                  setState(() {
+                    assuranceIssueDateController.text =
+                        Helpers.formatDateTimeToDate(value!, separator: "/");
+                  });
+                }
               }),
           Dimensions.verticalSpacer(15),
           const Text(
@@ -1088,13 +1124,15 @@ class _AddOrEditCarScreenState extends State<AddOrEditCarScreen> {
               controller: assuranceExpiryDateController,
               value: assuranceExpiryDateController.text,
               hintText: 'JJ/MM/AAAA',
-              enabled: false,
+              enabled: true,
               maxLength: 2,
               onDatePicked: (value) {
-                setState(() {
-                  assuranceExpiryDateController.text =
-                      Helpers.formatDateTimeToDate(value!, separator: "/");
-                });
+                if (value != null) {
+                  setState(() {
+                    assuranceExpiryDateController.text =
+                        Helpers.formatDateTimeToDate(value!, separator: "/");
+                  });
+                }
               }),
           Dimensions.verticalSpacer(15),
           DottedBorder(
@@ -1183,13 +1221,15 @@ class _AddOrEditCarScreenState extends State<AddOrEditCarScreen> {
             controller: technicalVisitIssueDateController,
             value: technicalVisitIssueDateController.text,
             hintText: 'JJ/MM/AAAA',
-            enabled: false,
+            enabled: true,
             maxLength: 2,
             onDatePicked: (value) {
-              setState(() {
-                technicalVisitIssueDateController.text =
-                    Helpers.formatDateTimeToDate(value!, separator: "/");
-              });
+              if (value != null) {
+                setState(() {
+                  technicalVisitIssueDateController.text =
+                      Helpers.formatDateTimeToDate(value!, separator: "/");
+                });
+              }
             },
           ),
           Dimensions.verticalSpacer(15),
@@ -1202,13 +1242,15 @@ class _AddOrEditCarScreenState extends State<AddOrEditCarScreen> {
             controller: technicalVisitExpiryDateController,
             value: technicalVisitExpiryDateController.text,
             hintText: 'JJ/MM/AAAA',
-            enabled: false,
+            enabled: true,
             maxLength: 2,
             onDatePicked: (value) {
-              setState(() {
-                technicalVisitExpiryDateController.text =
-                    Helpers.formatDateTimeToDate(value!, separator: "/");
-              });
+              if (value != null) {
+                setState(() {
+                  technicalVisitExpiryDateController.text =
+                      Helpers.formatDateTimeToDate(value!, separator: "/");
+                });
+              }
             },
           ),
           Dimensions.verticalSpacer(15),
@@ -1298,13 +1340,15 @@ class _AddOrEditCarScreenState extends State<AddOrEditCarScreen> {
             controller: tvmIssueDateController,
             value: tvmIssueDateController.text,
             hintText: 'JJ/MM/AAAA',
-            enabled: false,
+            enabled: true,
             maxLength: 2,
             onDatePicked: (value) {
-              setState(() {
-                tvmIssueDateController.text =
-                    Helpers.formatDateTimeToDate(value!, separator: "/");
-              });
+              if (value != null) {
+                setState(() {
+                  tvmIssueDateController.text =
+                      Helpers.formatDateTimeToDate(value!, separator: "/");
+                });
+              }
             },
           ),
           Dimensions.verticalSpacer(15),
@@ -1317,13 +1361,15 @@ class _AddOrEditCarScreenState extends State<AddOrEditCarScreen> {
             controller: tvmExpiryDateController,
             value: tvmExpiryDateController.text,
             hintText: 'JJ/MM/AAAA',
-            enabled: false,
+            enabled: true,
             maxLength: 2,
             onDatePicked: (value) {
-              setState(() {
-                tvmExpiryDateController.text =
-                    Helpers.formatDateTimeToDate(value!, separator: "/");
-              });
+              if (value != null) {
+                setState(() {
+                  tvmExpiryDateController.text =
+                      Helpers.formatDateTimeToDate(value!, separator: "/");
+                });
+              }
             },
           ),
           Dimensions.verticalSpacer(15),

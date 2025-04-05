@@ -47,6 +47,11 @@ dependencies:
   http_parser:
   path_provider:
   dropdown_search:
+  slider_button:
+  google_maps_flutter:
+  flutter_local_notifications:
+  socket_io_client: ^3.1.1
+  workmanager:
 
 dev_dependencies:
   flutter_test:

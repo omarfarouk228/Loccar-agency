@@ -50,8 +50,10 @@ class Helpers {
         .format(DateTime.parse(dateTime.toString()));
   }
 
-  static String formatDateTimeToString(DateTime dateTime) {
-    return DateFormat('dd-MM-yyyy HH:mm:ss')
+  static String formatDateTimeToString(DateTime dateTime,
+      {String lang = "fr"}) {
+    return DateFormat(
+            lang == "fr" ? 'dd-MM-yyyy HH:mm:ss' : 'yyyy-MM-dd HH:mm:ss')
         .format(DateTime.parse(dateTime.toString()));
   }
 

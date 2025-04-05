@@ -1,6 +1,8 @@
 import 'package:url_launcher/url_launcher.dart';
 
 class MapUtils {
+  static String apiKey = "AIzaSyByZrfedLJksd-psgizeOPOomGicK4k5_o";
+
   MapUtils._();
 
   static Future<void> openMap(double latitude, double longitude) async {

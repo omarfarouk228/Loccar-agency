@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:loccar_agency/services/rent_service_notification.dart';
 import 'package:loccar_agency/utils/colors.dart';
 import 'package:provider/provider.dart';
 import 'package:loccar_agency/utils/notifiers.dart';
@@ -21,6 +22,8 @@ class MyHttpOverrides extends HttpOverrides {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = MyHttpOverrides();
+  final rentService = RentNotificationService();
+  await rentService.initialize();
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider<MultipleNotifier>(

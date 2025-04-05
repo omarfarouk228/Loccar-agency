@@ -10,9 +10,9 @@ class TransactionModel {
   int paymentId;
   String transactionType;
   String status;
-  int validatedBy;
-  String validatedByType;
-  DateTime validatedAt;
+  int? validatedBy;
+  String? validatedByType;
+  DateTime? validatedAt;
   DateTime createdAt;
   DateTime updatedAt;
   OwnerModel receiverOwner;
@@ -28,9 +28,9 @@ class TransactionModel {
     required this.paymentId,
     required this.transactionType,
     required this.status,
-    required this.validatedBy,
-    required this.validatedByType,
-    required this.validatedAt,
+    this.validatedBy,
+    this.validatedByType,
+    this.validatedAt,
     required this.createdAt,
     required this.updatedAt,
     required this.receiverOwner,
@@ -50,7 +50,9 @@ class TransactionModel {
       status: json['status'],
       validatedBy: json['validated_by'],
       validatedByType: json['validated_by_type'],
-      validatedAt: DateTime.parse(json['validated_at']),
+      validatedAt: json['validated_at'] != null
+          ? DateTime.parse(json['validated_at'])
+          : null,
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
       receiverOwner: OwnerModel.fromJson(json['receiverOwner']),

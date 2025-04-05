@@ -5,6 +5,7 @@ import 'package:loccar_agency/models/car.dart';
 import 'package:loccar_agency/models/payment.dart';
 import 'package:loccar_agency/screens/dashboard/cars/add_or_edit_car_screen.dart';
 import 'package:loccar_agency/services/car.dart';
+import 'package:loccar_agency/utils/assets.dart';
 import 'package:loccar_agency/utils/bottom_sheet_helper.dart';
 import 'package:loccar_agency/utils/colors.dart';
 import 'package:loccar_agency/utils/constants.dart';
@@ -46,21 +47,37 @@ class _CarDetailsScreenState extends State<CarDetailsScreen> {
       ),
       body: Stack(
         children: [
-          SizedBox(
+          Container(
             height: double.maxFinite,
+            margin: const EdgeInsets.only(bottom: 65),
             child: SingleChildScrollView(
                 child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
+                  GestureDetector(
+                    onTap: () {
+                      BottomSheetHelper.showCustomBottomSheet(context,
+                          "Historique des paiements", _buildHistory(context),
+                          heightRatio: 0.6);
+                    },
+                    child: Card(
+                      color: Colors.grey.shade300,
+                      child: const ListTile(
+                        title: Text("Historique"),
+                        subtitle: Text("Voir l'historique des paiements"),
+                        trailing: FaIcon(
+                          FontAwesomeIcons.angleRight,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Dimensions.verticalSpacer(5),
                   _buildCarDetails(),
                   _buildOwnerDetails(),
-                  if (widget.car.assurances.isNotEmpty)
-                    _buildAssuranceSection(),
-                  if (widget.car.technicalVisits.isNotEmpty)
-                    _buildTechnicalVisitSection(),
-                  if (widget.car.tvms.isNotEmpty) _buildTvmSection(),
-                  if (widget.car.payments.isNotEmpty) _buildPaymentsSection()
+                  _buildAssuranceSection(),
+                  _buildTechnicalVisitSection(),
+                  _buildTvmSection(),
                 ],
               ),
             )),
@@ -70,7 +87,7 @@ class _CarDetailsScreenState extends State<CarDetailsScreen> {
               left: 0,
               right: 0,
               child: CustomFloatingActionButtons(
-                iconsData: const [Icons.edit, Icons.delete, Icons.add],
+                iconsData: [Icons.edit, Icons.delete, AppAssets.depositIcon],
                 callbacks: [
                   () {
                     Navigator.push(
@@ -124,24 +141,30 @@ class _CarDetailsScreenState extends State<CarDetailsScreen> {
                 label: 'Localisation',
                 value: widget.car.geolocation ? 'Oui' : 'Non'),
             Dimensions.verticalSpacer(10),
-            Row(
-              children: [
-                Visibility(
-                  visible: widget.car.grayCard != null,
-                  child: CustomCachedNetworkImage(
-                      imageUrl: "${Constants.baseUrl}/${widget.car.grayCard}",
-                      height: 50,
-                      width: 50,
-                      borderRadius: 7.75),
-                ),
-                ...widget.car.carPhotos.map((photo) {
-                  return CustomCachedNetworkImage(
-                      imageUrl: "${Constants.baseUrl}/${photo.carPhoto}",
-                      height: 50,
-                      width: 50,
-                      borderRadius: 7.75);
-                })
-              ],
+            SizedBox(
+              height: 100,
+              width: Dimensions.getScreenWidth(context),
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                children: [
+                  Visibility(
+                    visible: widget.car.grayCard != null,
+                    child: CustomCachedNetworkImage(
+                        imageUrl: "${Constants.baseUrl}/${widget.car.grayCard}",
+                        height: 50,
+                        width: 50,
+                        borderRadius: 7.75),
+                  ),
+                  ...widget.car.carPhotos.map((photo) {
+                    return CustomCachedNetworkImage(
+                        imageUrl: "${Constants.baseUrl}/${photo.carPhoto}",
+                        height: 50,
+                        width: 50,
+                        borderRadius: 7.75);
+                  })
+                ],
+              ),
             )
           ],
         ),
@@ -201,164 +224,200 @@ class _CarDetailsScreenState extends State<CarDetailsScreen> {
   Widget _buildAssuranceSection() {
     return CustomAccordion(
       title: 'Assurance',
-      subTitle: 'Informations de la dernière assurance',
+      subTitle:
+          Helpers.getDiffBetweenDates(widget.car.assurances.first.expiryDate)
+                      .$2 ==
+                  0
+              ? 'Expirée'
+              : 'Informations de la dernière assurance',
       headerBackgroundColor: AppColors.thirdyColor,
       titleStyle: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.bold,
         color: Colors.white,
       ),
-      subTitleStyle: const TextStyle(
+      subTitleStyle: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.normal,
-        color: Colors.white,
+        color:
+            Helpers.getDiffBetweenDates(widget.car.assurances.first.expiryDate)
+                        .$2 ==
+                    0
+                ? AppColors.secondaryColor
+                : Colors.white,
       ),
       toggleIconOpen: Icons.keyboard_arrow_down_sharp,
       toggleIconClose: Icons.keyboard_arrow_up_sharp,
       headerIconColor: Colors.white,
       accordionElevation: 2,
-      widgetItems: Column(
-        children: [
-          _buildAccordionItem(
-              label: "Status",
-              value: Helpers.getDiffBetweenDates(
-                      widget.car.assurances.first.expiryDate)
-                  .$1,
-              color: Helpers.getDiffBetweenDates(
-                      widget.car.assurances.first.expiryDate)
-                  .$3),
-          Dimensions.verticalSpacer(10),
-          _buildAccordionItem(
-              label: "Date de délivrance",
-              value: Helpers.formatDateTimeToDate(
-                  widget.car.assurances.first.issueDate)),
-          Dimensions.verticalSpacer(10),
-          _buildAccordionItem(
-              label: "Date d'expiration",
-              value: Helpers.formatDateTimeToDate(
-                  widget.car.assurances.first.expiryDate)),
-          Dimensions.verticalSpacer(10),
-          Visibility(
-            visible: widget.car.assurances.first.file.isNotEmpty,
-            child: CustomCachedNetworkImage(
-                imageUrl:
-                    "${Constants.baseUrl}/${widget.car.assurances.first.file}",
-                height: 200,
-                width: double.infinity,
-                borderRadius: 7.75),
-          ),
-        ],
-      ),
+      widgetItems: widget.car.assurances.isNotEmpty
+          ? Column(
+              children: [
+                _buildAccordionItem(
+                    label: "Status",
+                    value: Helpers.getDiffBetweenDates(
+                            widget.car.assurances.first.expiryDate)
+                        .$1,
+                    color: Helpers.getDiffBetweenDates(
+                            widget.car.assurances.first.expiryDate)
+                        .$3),
+                Dimensions.verticalSpacer(10),
+                _buildAccordionItem(
+                    label: "Date de délivrance",
+                    value: Helpers.formatDateTimeToDate(
+                        widget.car.assurances.first.issueDate)),
+                Dimensions.verticalSpacer(10),
+                _buildAccordionItem(
+                    label: "Date d'expiration",
+                    value: Helpers.formatDateTimeToDate(
+                        widget.car.assurances.first.expiryDate)),
+                Dimensions.verticalSpacer(10),
+                Visibility(
+                  visible: widget.car.assurances.first.file.isNotEmpty,
+                  child: CustomCachedNetworkImage(
+                      imageUrl:
+                          "${Constants.baseUrl}/${widget.car.assurances.first.file}",
+                      height: 200,
+                      width: double.infinity,
+                      borderRadius: 7.75),
+                ),
+              ],
+            )
+          : const Text("Aucune assurance"),
     );
   }
 
   Widget _buildTechnicalVisitSection() {
     return CustomAccordion(
         title: 'Visite technique',
-        subTitle: 'Informations de la dernière visite',
+        subTitle: Helpers.getDiffBetweenDates(
+                        widget.car.technicalVisits.first.expiryDate)
+                    .$2 ==
+                0
+            ? 'Expirée'
+            : 'Informations de la dernière visite',
         headerBackgroundColor: AppColors.thirdyColor,
         titleStyle: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
-        subTitleStyle: const TextStyle(
+        subTitleStyle: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.normal,
-          color: Colors.white,
+          color: Helpers.getDiffBetweenDates(
+                          widget.car.technicalVisits.first.expiryDate)
+                      .$2 ==
+                  0
+              ? AppColors.secondaryColor
+              : Colors.white,
         ),
         toggleIconOpen: Icons.keyboard_arrow_down_sharp,
         toggleIconClose: Icons.keyboard_arrow_up_sharp,
         headerIconColor: Colors.white,
         accordionElevation: 2,
-        widgetItems: Column(
-          children: [
-            _buildAccordionItem(
-                label: "Status",
-                value: Helpers.getDiffBetweenDates(
-                        widget.car.technicalVisits.first.expiryDate)
-                    .$1,
-                color: Helpers.getDiffBetweenDates(
-                        widget.car.technicalVisits.first.expiryDate)
-                    .$3),
-            Dimensions.verticalSpacer(10),
-            _buildAccordionItem(
-                label: "Date de délivrance",
-                value: Helpers.formatDateTimeToDate(
-                    widget.car.technicalVisits.first.issueDate)),
-            Dimensions.verticalSpacer(10),
-            _buildAccordionItem(
-                label: "Date d'expiration",
-                value: Helpers.formatDateTimeToDate(
-                    widget.car.technicalVisits.first.expiryDate)),
-            Dimensions.verticalSpacer(10),
-            Visibility(
-              visible: widget.car.technicalVisits.first.file.isNotEmpty,
-              child: CustomCachedNetworkImage(
-                  imageUrl:
-                      "${Constants.baseUrl}/${widget.car.technicalVisits.first.file}",
-                  height: 200,
-                  width: double.infinity,
-                  borderRadius: 7.75),
-            ),
-          ],
-        ));
+        widgetItems: widget.car.technicalVisits.isNotEmpty
+            ? Column(
+                children: [
+                  _buildAccordionItem(
+                      label: "Status",
+                      value: Helpers.getDiffBetweenDates(
+                              widget.car.technicalVisits.first.expiryDate)
+                          .$1,
+                      color: Helpers.getDiffBetweenDates(
+                              widget.car.technicalVisits.first.expiryDate)
+                          .$3),
+                  Dimensions.verticalSpacer(10),
+                  _buildAccordionItem(
+                      label: "Date de délivrance",
+                      value: Helpers.formatDateTimeToDate(
+                          widget.car.technicalVisits.first.issueDate)),
+                  Dimensions.verticalSpacer(10),
+                  _buildAccordionItem(
+                      label: "Date d'expiration",
+                      value: Helpers.formatDateTimeToDate(
+                          widget.car.technicalVisits.first.expiryDate)),
+                  Dimensions.verticalSpacer(10),
+                  Visibility(
+                    visible: widget.car.technicalVisits.first.file.isNotEmpty,
+                    child: CustomCachedNetworkImage(
+                        imageUrl:
+                            "${Constants.baseUrl}/${widget.car.technicalVisits.first.file}",
+                        height: 200,
+                        width: double.infinity,
+                        borderRadius: 7.75),
+                  ),
+                ],
+              )
+            : const Text("Aucune visite technique"));
   }
 
   Widget _buildTvmSection() {
     return CustomAccordion(
         title: 'TVM',
-        subTitle: 'Informations de la dernière TVM',
+        subTitle:
+            Helpers.getDiffBetweenDates(widget.car.assurances.first.expiryDate)
+                        .$2 ==
+                    0
+                ? 'Expirée'
+                : 'Informations de la dernière TVM',
         headerBackgroundColor: AppColors.thirdyColor,
         titleStyle: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
-        subTitleStyle: const TextStyle(
+        subTitleStyle: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.normal,
-          color: Colors.white,
+          color: Helpers.getDiffBetweenDates(
+                          widget.car.assurances.first.expiryDate)
+                      .$2 ==
+                  0
+              ? AppColors.secondaryColor
+              : Colors.white,
         ),
         toggleIconOpen: Icons.keyboard_arrow_down_sharp,
         toggleIconClose: Icons.keyboard_arrow_up_sharp,
         headerIconColor: Colors.white,
         accordionElevation: 2,
-        widgetItems: Column(
-          children: [
-            _buildAccordionItem(
-                label: "Status",
-                value: Helpers.getDiffBetweenDates(
-                        widget.car.tvms.first.expiryDate)
-                    .$1,
-                color: Helpers.getDiffBetweenDates(
-                        widget.car.tvms.first.expiryDate)
-                    .$3),
-            Dimensions.verticalSpacer(10),
-            _buildAccordionItem(
-                label: "Date de délivrance",
-                value: Helpers.formatDateTimeToDate(
-                    widget.car.tvms.first.issueDate)),
-            Dimensions.verticalSpacer(10),
-            _buildAccordionItem(
-                label: "Date d'expiration",
-                value: Helpers.formatDateTimeToDate(
-                    widget.car.tvms.first.expiryDate)),
-            Dimensions.verticalSpacer(10),
-            Visibility(
-              visible: widget.car.tvms.first.file.isNotEmpty,
-              child: CustomCachedNetworkImage(
-                  imageUrl:
-                      "${Constants.baseUrl}/${widget.car.tvms.first.file}",
-                  height: 200,
-                  width: double.infinity,
-                  borderRadius: 7.75),
-            ),
-          ],
-        ));
+        widgetItems: widget.car.tvms.isNotEmpty
+            ? Column(
+                children: [
+                  _buildAccordionItem(
+                      label: "Status",
+                      value: Helpers.getDiffBetweenDates(
+                              widget.car.tvms.first.expiryDate)
+                          .$1,
+                      color: Helpers.getDiffBetweenDates(
+                              widget.car.tvms.first.expiryDate)
+                          .$3),
+                  Dimensions.verticalSpacer(10),
+                  _buildAccordionItem(
+                      label: "Date de délivrance",
+                      value: Helpers.formatDateTimeToDate(
+                          widget.car.tvms.first.issueDate)),
+                  Dimensions.verticalSpacer(10),
+                  _buildAccordionItem(
+                      label: "Date d'expiration",
+                      value: Helpers.formatDateTimeToDate(
+                          widget.car.tvms.first.expiryDate)),
+                  Dimensions.verticalSpacer(10),
+                  Visibility(
+                    visible: widget.car.tvms.first.file.isNotEmpty,
+                    child: CustomCachedNetworkImage(
+                        imageUrl:
+                            "${Constants.baseUrl}/${widget.car.tvms.first.file}",
+                        height: 200,
+                        width: double.infinity,
+                        borderRadius: 7.75),
+                  ),
+                ],
+              )
+            : const Text("Aucune TVM"));
   }
 
-  Widget _buildPaymentsSection() {
+  /* Widget _buildPaymentsSection() {
     return CustomAccordion(
         title: 'Historique de Paiements',
         subTitle: "Consultez l'historique des paiements de la voiture",
@@ -392,7 +451,7 @@ class _CarDetailsScreenState extends State<CarDetailsScreen> {
                   ))
               .toList(),
         ));
-  }
+  }*/
 
   Widget _buildAccordionItem({
     required String label,
@@ -521,5 +580,31 @@ class _CarDetailsScreenState extends State<CarDetailsScreen> {
         )
       ]),
     );
+  }
+
+  Widget _buildHistory(context) {
+    return widget.car.payments.isNotEmpty
+        ? Column(
+            children: widget.car.payments
+                .map((PaymentModel payment) => Card(
+                      child: ListTile(
+                        title: Text(
+                          "${payment.entrySource} - ${payment.amount} FCFA",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(payment.wording),
+                        trailing: Text(
+                            Helpers.formatDateTimeToDate(payment.createdAt)),
+                      ),
+                    ))
+                .toList())
+        : SizedBox(
+            height: Dimensions.getScreenHeight(context) / 2,
+            child: const Center(
+                child: Text(
+              "Aucun historique",
+              style: TextStyle(color: Colors.black54, fontSize: 20),
+            )),
+          );
   }
 }

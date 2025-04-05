@@ -122,13 +122,16 @@ class BottomSheetHelper {
                               style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
-                            CircleAvatar(
-                              backgroundColor: AppColors.primaryColor,
-                              radius: 15,
-                              child: const FaIcon(
-                                FontAwesomeIcons.xmark,
-                                color: Colors.white,
-                                size: 15,
+                            GestureDetector(
+                              onTap: () => Navigator.pop(ctx),
+                              child: CircleAvatar(
+                                backgroundColor: AppColors.primaryColor,
+                                radius: 15,
+                                child: const FaIcon(
+                                  FontAwesomeIcons.xmark,
+                                  color: Colors.white,
+                                  size: 15,
+                                ),
                               ),
                             ),
                           ],

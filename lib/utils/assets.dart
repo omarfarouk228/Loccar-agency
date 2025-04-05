@@ -24,4 +24,8 @@ class AppAssets {
   static String historyIcon = "assets/icons/history.svg";
 
   static String banner = "assets/images/banner.jpg";
+
+  static String depositIcon = "assets/icons/deposit_icon.svg";
+
+  static var transactionsIcon = "assets/icons/transactions.svg";
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:loccar_agency/models/transaction.dart';
-import 'package:loccar_agency/services/transaction.dart';
+import 'package:loccar_agency/models/payment.dart';
+import 'package:loccar_agency/services/payment.dart';
 import 'package:loccar_agency/utils/colors.dart';
 import 'package:loccar_agency/utils/constants.dart';
 import 'package:loccar_agency/utils/dimensions.dart';
@@ -18,22 +18,22 @@ class HistoryScreen extends StatefulWidget {
 class _HistoryScreenState extends State<HistoryScreen> {
   final _filterFieldController = TextEditingController();
 
-  List<TransactionModel> transactions = [];
-  List<TransactionModel> transactionsFiltered = [];
+  List<PaymentModel> payments = [];
+  List<PaymentModel> paymentsFiltered = [];
   List dates = [];
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _getTransactions());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _getPayments());
 
     _filterFieldController.addListener(() {
       setState(() {
         if (_filterFieldController.text.isNotEmpty) {
           String searchText = _filterFieldController.text.toString().trim();
 
-          transactionsFiltered = transactions
+          paymentsFiltered = payments
               .where((item) =>
                   (item.amount
                       .toString()
@@ -43,29 +43,25 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       .toString()
                       .toLowerCase()
                       .contains(searchText.toLowerCase())) ||
-                  (item.transactionType
-                      .toString()
-                      .toLowerCase()
-                      .contains(searchText.toLowerCase())) ||
-                  (item.receiverType
+                  (item.wording
                       .toString()
                       .toLowerCase()
                       .contains(searchText.toLowerCase())))
               .toList();
         } else {
-          transactionsFiltered = transactions;
+          paymentsFiltered = payments;
         }
       });
     });
   }
 
-  Future<void> _getTransactions() async {
+  Future<void> _getPayments() async {
     setState(() {
       isLoading = true;
     });
-    var response = await TransactionService().fetchRents();
-    transactions = response.$1;
-    transactionsFiltered = transactions;
+    var response = await PaymentService().fetchPayments();
+    payments = response.$1;
+    paymentsFiltered = payments;
     dates = response.$2;
 
     debugPrint("dates: $dates");
@@ -125,7 +121,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.only(top: 6),
-                                hintText: "Rechercher une transaction",
+                                hintText: "Rechercher un paiement",
                                 hintStyle: TextStyle(
                                   color: Colors.black54,
                                   fontSize: 13,
@@ -153,7 +149,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: !isLoading
-                    ? transactionsFiltered.isNotEmpty
+                    ? paymentsFiltered.isNotEmpty
                         ? Container(
                             color: Colors.grey.shade200,
                             width: Dimensions.getScreenWidth(context),
@@ -164,11 +160,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                 itemCount: dates.length,
                                 itemBuilder: (BuildContext context, index) {
                                   return Visibility(
-                                    visible: transactionsFiltered
-                                        .where((transaction) =>
+                                    visible: paymentsFiltered
+                                        .where((payment) =>
                                             Helpers.formatDateTimeToDate(
-                                                transaction.createdAt,
-                                                lang: "fr") ==
+                                                payment.createdAt,
+                                                lang: "en") ==
                                             dates[index])
                                         .isNotEmpty,
                                     child: Column(
@@ -212,27 +208,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                             shrinkWrap: true,
                                             physics:
                                                 const NeverScrollableScrollPhysics(),
-                                            itemCount: transactionsFiltered
-                                                .where((transaction) =>
+                                            itemCount: paymentsFiltered
+                                                .where((payment) =>
                                                     Helpers
                                                         .formatDateTimeToDate(
-                                                            transaction
-                                                                .createdAt,
-                                                            lang: "fr") ==
+                                                            payment.createdAt,
+                                                            lang: "en") ==
                                                     dates[index])
                                                 .length,
                                             itemBuilder:
                                                 (BuildContext context, index2) {
-                                              TransactionModel transaction =
-                                                  transactionsFiltered
-                                                      .where((transaction) =>
-                                                          Helpers
-                                                              .formatDateTimeToDate(
-                                                                  transaction
-                                                                      .createdAt,
-                                                                  lang: "fr") ==
-                                                          dates[index])
-                                                      .elementAt(index2);
+                                              PaymentModel payment = paymentsFiltered
+                                                  .where((payment) =>
+                                                      Helpers
+                                                          .formatDateTimeToDate(
+                                                              payment.createdAt,
+                                                              lang: "en") ==
+                                                      dates[index])
+                                                  .elementAt(index2);
                                               return Card(
                                                 color: Colors.white,
                                                 elevation: 0.0,
@@ -242,7 +235,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                                       const EdgeInsets.only(
                                                           right: 5, left: 10),
                                                   title: Text(
-                                                    "${transaction.transactionType} - ${transaction.amount} Fcfa ",
+                                                    payment.wording,
                                                     style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold),
@@ -250,40 +243,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                                   subtitle: Text(
                                                     Helpers
                                                         .formatDateTimeToString(
-                                                            transaction
-                                                                .createdAt),
+                                                            payment.createdAt),
                                                     style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.bold),
                                                   ),
-                                                  trailing: Container(
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20),
-                                                        color: transaction
-                                                                    .status ==
-                                                                "approved"
-                                                            ? Colors.green
-                                                            : Colors.orange,
-                                                      ),
-                                                      height: 30,
-                                                      width: Dimensions
-                                                              .getScreenWidth(
-                                                                  context) *
-                                                          0.28,
-                                                      child: Center(
-                                                        child: Text(
-                                                          transaction.status ==
-                                                                  "approved"
-                                                              ? "Validé"
-                                                              : "En attente",
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                        ),
-                                                      )),
+                                                  trailing: Text(
+                                                    "${payment.amount} Fcfa",
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.red),
+                                                  ),
                                                 ),
                                               );
                                             }),
@@ -294,7 +265,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           )
                         : const Center(
                             child: Text(
-                              "Aucune transaction",
+                              "Aucun paiement",
                               style: TextStyle(
                                   color: Colors.black54, fontSize: 20),
                             ),

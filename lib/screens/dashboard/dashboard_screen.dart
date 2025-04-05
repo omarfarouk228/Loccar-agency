@@ -3,6 +3,8 @@ import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:loccar_agency/packages/elegant_nav_bar.dart';
 import 'package:loccar_agency/screens/dashboard/history_screen.dart';
 import 'package:loccar_agency/screens/dashboard/profile_screen.dart';
+import 'package:loccar_agency/screens/dashboard/transactions_screen.dart';
+import 'package:loccar_agency/services/rent_service_notification.dart';
 import 'package:loccar_agency/utils/assets.dart';
 import 'package:loccar_agency/utils/colors.dart' as loccar_app;
 
@@ -20,12 +22,23 @@ class DashboardScreen extends StatefulWidget {
 class DashboardScreenState extends State<DashboardScreen> {
   final ZoomDrawerController z = ZoomDrawerController();
   int currentIndex = 0;
+  final RentNotificationService _rentService = RentNotificationService();
 
-  List<Widget> screens = const [HomeScreen(), HistoryScreen(), ProfileScreen()];
+  List<Widget> screens = const [
+    HomeScreen(),
+    HistoryScreen(),
+    TransactionsScreen(),
+    ProfileScreen()
+  ];
 
   @override
   void initState() {
     super.initState();
+    _checkRents();
+  }
+
+  Future<void> _checkRents() async {
+    await _rentService.checkForNewRents();
   }
 
   @override
@@ -65,6 +78,8 @@ class DashboardScreenState extends State<DashboardScreen> {
           items: [
             NavigationItem(label: 'Accueil', icon: AppAssets.homeIcon),
             NavigationItem(label: 'Historique', icon: AppAssets.historyIcon),
+            NavigationItem(
+                label: 'Transactions', icon: AppAssets.transactionsIcon),
             NavigationItem(
                 label: 'Mon compte',
                 iconWidget: const CircleAvatar(

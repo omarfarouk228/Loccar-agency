@@ -111,12 +111,17 @@ class DioHelper {
     try {
       debugPrint("Request url: $path");
       debugPrint("Query parameters: ${queryParameters ?? {}}");
+      debugPrint("Data: ${data ?? {}}");
       return await _dio.put(
         path,
         data: data,
         queryParameters: queryParameters,
       );
     } on DioException catch (e) {
+      debugPrint("DioException status code: ${e.response?.statusCode}");
+      debugPrint("DioException response data: ${e.response?.data}");
+      debugPrint("DioException headers: ${e.response?.headers}");
+      debugPrint("DioException message: ${e.message}");
       _logger.severe('PUT request error', e);
       rethrow;
     }
@@ -189,6 +194,7 @@ class _AuthInterceptor extends Interceptor {
     final token = await SharedPreferencesHelper.getValue('auth_token');
 
     if (token.isNotEmpty) {
+      debugPrint("Token: $token");
       options.headers['Authorization'] = 'Bearer $token';
     }
 

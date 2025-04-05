@@ -9,7 +9,6 @@ import 'package:loccar_agency/utils/colors.dart';
 import 'package:loccar_agency/utils/constants.dart';
 import 'package:loccar_agency/utils/dimensions.dart';
 import 'package:loccar_agency/utils/shimmer_helper.dart';
-import 'package:loccar_agency/widgets/buttons/sized_button.dart';
 
 class CarsListScreen extends StatefulWidget {
   const CarsListScreen({super.key});
@@ -85,52 +84,52 @@ class _CarsListScreenState extends State<CarsListScreen> {
       ),
       body: isLoading
           ? ShimmerHelper.getShimmerListModel(context)
-          : Column(
-              children: [
-                Container(
-                  height: 50,
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  child: TextFormField(
-                    keyboardType: TextInputType.text,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                    ),
-                    controller: _filterFieldController,
-                    decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
-                      hintText: "Rechercher une voiture",
-                      hintStyle: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 15,
-                        fontFamily: Constants.currentFontFamily,
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    height: 50,
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    child: TextFormField(
+                      keyboardType: TextInputType.text,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
                       ),
-                      prefixIcon: const Icon(
-                        FontAwesomeIcons.magnifyingGlass,
-                        color: Colors.black54,
+                      controller: _filterFieldController,
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        hintText: "Rechercher une voiture",
+                        hintStyle: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 15,
+                          fontFamily: Constants.currentFontFamily,
+                        ),
+                        prefixIcon: const Icon(
+                          FontAwesomeIcons.magnifyingGlass,
+                          color: Colors.black54,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Dimensions.verticalSpacer(5),
-                Container(
-                  height: 40,
-                  color: Colors.grey.shade400,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Voiture",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text("Location",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                    ],
+                  Dimensions.verticalSpacer(5),
+                  Container(
+                    height: 40,
+                    color: Colors.grey.shade400,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Voiture",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text("Location",
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
                   ),
-                ),
-                Dimensions.verticalSpacer(5),
-                Expanded(
-                  child: RefreshIndicator(
+                  Dimensions.verticalSpacer(5),
+                  RefreshIndicator(
                       onRefresh: () => _getCars(),
                       child: ListView.builder(
                         itemCount: carsFiltered.length,
@@ -205,8 +204,8 @@ class _CarsListScreenState extends State<CarsListScreen> {
                           );
                         },
                       )),
-                ),
-              ],
+                ],
+              ),
             ),
     );
   }

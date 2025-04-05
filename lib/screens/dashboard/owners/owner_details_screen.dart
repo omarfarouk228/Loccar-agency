@@ -1,12 +1,16 @@
+import 'package:custom_accordion/custom_accordion.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:loccar_agency/models/car.dart';
 import 'package:loccar_agency/models/owner.dart';
+import 'package:loccar_agency/models/payment.dart';
 import 'package:loccar_agency/screens/dashboard/owners/add_or_edit_owner_screen.dart';
 import 'package:loccar_agency/services/owner.dart';
 import 'package:loccar_agency/utils/bottom_sheet_helper.dart';
 import 'package:loccar_agency/utils/colors.dart';
 import 'package:loccar_agency/utils/constants.dart';
 import 'package:loccar_agency/utils/dimensions.dart';
+import 'package:loccar_agency/utils/helpers.dart';
 import 'package:loccar_agency/utils/snack_bar_helper.dart';
 import 'package:loccar_agency/widgets/buttons/rounded_button.dart';
 import 'package:loccar_agency/widgets/floating_action_buttons.dart';
@@ -32,8 +36,9 @@ class _OwnerDetailsScreenState extends State<OwnerDetailsScreen> {
       ),
       body: Stack(
         children: [
-          SizedBox(
+          Container(
             height: double.maxFinite,
+            margin: const EdgeInsets.only(bottom: 65),
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -41,7 +46,28 @@ class _OwnerDetailsScreenState extends State<OwnerDetailsScreen> {
                   children: [
                     _buildWalletSection(),
                     Dimensions.verticalSpacer(10),
+                    //if (widget.owner.payments.isNotEmpty)
+                    GestureDetector(
+                      onTap: () {
+                        BottomSheetHelper.showCustomBottomSheet(context,
+                            "Historique des retraits", _buildHistory(context),
+                            heightRatio: 0.6);
+                      },
+                      child: Card(
+                        color: Colors.grey.shade300,
+                        child: const ListTile(
+                          title: Text("Historique"),
+                          subtitle: Text("Voir l'historique des retraits"),
+                          trailing: FaIcon(
+                            FontAwesomeIcons.angleRight,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Dimensions.verticalSpacer(10),
                     _buildInfosSection(),
+                    Dimensions.verticalSpacer(10),
+                    if (widget.owner.cars.isNotEmpty) _buildCarsSection(),
                   ],
                 ),
               ),
@@ -77,10 +103,10 @@ class _OwnerDetailsScreenState extends State<OwnerDetailsScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
         ),
-        elevation: 4,
+        elevation: 2,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.grey,
+            color: Colors.grey.shade400,
             borderRadius: BorderRadius.circular(5),
           ),
           padding: const EdgeInsets.all(16),
@@ -201,6 +227,41 @@ class _OwnerDetailsScreenState extends State<OwnerDetailsScreen> {
     );
   }
 
+  Widget _buildCarsSection() {
+    return CustomAccordion(
+        title: 'Liste des voitures',
+        subTitle: "Consultez les voitures de ${widget.owner.fullName}",
+        headerBackgroundColor: AppColors.thirdyColor,
+        titleStyle: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+        subTitleStyle: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.normal,
+          color: Colors.white,
+        ),
+        toggleIconOpen: Icons.keyboard_arrow_down_sharp,
+        toggleIconClose: Icons.keyboard_arrow_up_sharp,
+        headerIconColor: Colors.white,
+        accordionElevation: 2,
+        widgetItems: Column(
+          children: widget.owner.cars
+              .map((CarModel car) => Card(
+                    child: ListTile(
+                      title: Text(
+                        "${car.brand} - ${car.model} - ${car.year}",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                          "${car.plateCountry} - ${car.plateNumber} - ${car.plateSeries}"),
+                    ),
+                  ))
+              .toList(),
+        ));
+  }
+
   Widget _buildAccordionItem({
     required String label,
     required String value,
@@ -214,6 +275,33 @@ class _OwnerDetailsScreenState extends State<OwnerDetailsScreen> {
         Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
       ],
     );
+  }
+
+  Widget _buildHistory(context) {
+    return widget.owner.payments.isNotEmpty
+        ? Column(
+            children: widget.owner.payments
+                .map((PaymentModel payment) => Card(
+                      child: ListTile(
+                        title: Text(
+                          "${payment.amount} FCFA",
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(payment.wording),
+                        trailing: Text(
+                            Helpers.formatDateTimeToDate(payment.createdAt)),
+                      ),
+                    ))
+                .toList(),
+          )
+        : SizedBox(
+            height: Dimensions.getScreenHeight(context) / 2,
+            child: const Center(
+                child: Text(
+              "Aucun historique",
+              style: TextStyle(color: Colors.black54, fontSize: 20),
+            )),
+          );
   }
 
   void showDeleteDialog(context) {

@@ -1,3 +1,6 @@
+import 'package:loccar_agency/models/car.dart';
+import 'package:loccar_agency/models/payment.dart';
+
 class OwnerModel {
   final int id;
   final String ref;
@@ -24,6 +27,8 @@ class OwnerModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final int? carCount;
+  final List<CarModel> cars;
+  final List<PaymentModel> payments;
 
   OwnerModel({
     required this.id,
@@ -51,35 +56,57 @@ class OwnerModel {
     required this.createdAt,
     required this.updatedAt,
     this.carCount,
+    this.cars = const [],
+    this.payments = const [],
   });
 
-  factory OwnerModel.fromJson(Map<String, dynamic> json) => OwnerModel(
-        id: json['id'],
-        ref: json['ref'],
-        accountType: json['accountType'],
-        email: json['email'],
-        agencyId: json['agencyId'],
-        administratorId: json['administratorId'],
-        cardTypeId: json['cardTypeId'],
-        balance: json['balance'],
-        phoneNumber: json['phoneNumber'],
-        phoneNumberBis: json['phoneNumberBis'],
-        fullName: json['fullName'],
-        idCardNumber: json['idCardNumber'],
-        idCard: json['idCard'],
-        photo: json['photo'],
-        socialReason: json['socialReason'],
-        professionalCardNumber: json['professionalCardNumber'],
-        professionalCard: json['prefessionalCard'],
-        responsibleFullName: json['responsibleFullName'],
-        fullAddress: json['fullAddress'],
-        geolocalisation: json['geolocalisation'],
-        password: json['password'],
-        lastLogin: DateTime.parse(json['lastLogin']),
-        createdAt: DateTime.parse(json['createdAt']),
-        updatedAt: DateTime.parse(json['updatedAt']),
-        carCount: json['carCount'] ?? 0,
-      );
+  factory OwnerModel.fromJson(Map<String, dynamic> json) {
+    List<CarModel> carsList = [];
+
+    if (json['cars'] != null) {
+      for (var payment in json['cars']) {
+        carsList.add(CarModel.fromJson(payment));
+      }
+    }
+
+    List<PaymentModel> paymentsList = [];
+
+    if (json['payments'] != null) {
+      for (var payment in json['payments']) {
+        paymentsList.add(PaymentModel.fromJson(payment));
+      }
+    }
+
+    return OwnerModel(
+      id: json['id'],
+      ref: json['ref'],
+      accountType: json['accountType'],
+      email: json['email'],
+      agencyId: json['agencyId'],
+      administratorId: json['administratorId'],
+      cardTypeId: json['cardTypeId'],
+      balance: json['balance'],
+      phoneNumber: json['phoneNumber'],
+      phoneNumberBis: json['phoneNumberBis'],
+      fullName: json['fullName'],
+      idCardNumber: json['idCardNumber'],
+      idCard: json['idCard'],
+      photo: json['photo'],
+      socialReason: json['socialReason'],
+      professionalCardNumber: json['professionalCardNumber'],
+      professionalCard: json['prefessionalCard'],
+      responsibleFullName: json['responsibleFullName'],
+      fullAddress: json['fullAddress'],
+      geolocalisation: json['geolocalisation'],
+      password: json['password'],
+      lastLogin: DateTime.parse(json['lastLogin']),
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
+      carCount: json['carCount'] ?? 0,
+      cars: carsList,
+      payments: paymentsList,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,

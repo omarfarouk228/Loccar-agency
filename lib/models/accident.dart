@@ -1,3 +1,6 @@
+import 'package:loccar_agency/models/car.dart';
+import 'package:loccar_agency/models/owner.dart';
+
 class AccidentModel {
   final int id;
   final int carId;
@@ -9,6 +12,8 @@ class AccidentModel {
   final double longitude;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final CarModel? car;
+  final OwnerModel? owner;
 
   AccidentModel({
     required this.id,
@@ -21,6 +26,8 @@ class AccidentModel {
     required this.longitude,
     required this.createdAt,
     required this.updatedAt,
+    this.car,
+    this.owner,
   });
 
   factory AccidentModel.fromJson(Map<String, dynamic> json) {
@@ -35,6 +42,8 @@ class AccidentModel {
       longitude: json['longitude'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
+      car: json['car'] != null ? CarModel.fromJson(json['car']) : null,
+      owner: json['owner'] != null ? OwnerModel.fromJson(json['owner']) : null,
     );
   }
 }
